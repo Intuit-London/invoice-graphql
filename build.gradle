@@ -1,4 +1,4 @@
-group 'es.jjcoellov'
+group 'com.intuit.workshop'
 version '1.0-SNAPSHOT'
 
 buildscript {
@@ -17,6 +17,7 @@ apply plugin: 'spring-boot'
 
 repositories {
     mavenCentral()
+    mavenLocal()
 }
 
 sourceCompatibility = 1.8
@@ -32,7 +33,7 @@ dependencies {
     compile('org.codehaus.groovy:groovy-all')
 
     compile 'com.graphql-java:graphql-java:2.1.0'
-    compile "com.graphql-java:graphql-java-annotations:0.9.0"
+    compile "com.graphql-java:graphql-java-annotations:0.11.1-juanjo" // custom build to fix mutations on object lists
 
     testCompile 'org.codehaus.groovy:groovy-all'
     testCompile 'org.spockframework:spock-core:1.1-groovy-2.4-rc-2'

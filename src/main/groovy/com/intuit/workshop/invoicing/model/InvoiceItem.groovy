@@ -1,19 +1,20 @@
-package com.intuit.workshop.invoice.model
+package com.intuit.workshop.invoicing.model
 
 import graphql.annotations.GraphQLField
 
 class InvoiceItem {
 
     @GraphQLField
-    public Invoice invoice
+    public String id
 
     @GraphQLField
-    public String id
+    public Invoice invoice
 
     @GraphQLField
     public String name
 
     @GraphQLField
+    // TODO Amount
     public Integer price
 
 }
