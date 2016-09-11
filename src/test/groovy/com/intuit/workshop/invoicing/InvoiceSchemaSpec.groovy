@@ -1,7 +1,9 @@
 package com.intuit.workshop.invoicing
 
 import com.intuit.workshop.invoicing.graphql.GraphQLSchemaHolder
-import com.intuit.workshop.invoicing.model.Invoice
+import com.intuit.workshop.invoicing.graphql.fetcher.util.StaticModelBuilder
+import com.intuit.workshop.invoicing.graphql.payload.RelayMutationResponse
+import com.intuit.workshop.invoicing.util.SchemaSpecFixture
 import graphql.GraphQL
 import graphql.schema.DataFetcher
 import graphql.schema.DataFetchingEnvironment
@@ -9,7 +11,6 @@ import graphql.schema.GraphQLSchema
 import spock.lang.Specification
 
 class InvoiceSchemaSpec extends Specification {
-
 
     GraphQLSchema schema
 
@@ -42,8 +43,8 @@ class InvoiceSchemaSpec extends Specification {
                                                 ]
 
                                         ],
-                                        creationDate: SchemaSpecFixture.DATE.toString(),
-                                        paymentDate : SchemaSpecFixture.DATE.toString(),
+                                        creationDate: StaticModelBuilder.DATE.toString(),
+                                        paymentDate : StaticModelBuilder.DATE.toString(),
                                         paid        : true,
                                         items       : [
                                                 [
@@ -83,7 +84,7 @@ class InvoiceSchemaSpec extends Specification {
                                                 ]
 
                                         ],
-                                        creationDate: SchemaSpecFixture.DATE.toString(),
+                                        creationDate: StaticModelBuilder.DATE.toString(),
                                         paymentDate : null,
                                         paid        : false,
                                         items       : [
@@ -141,8 +142,8 @@ class InvoiceSchemaSpec extends Specification {
                                                 ]
 
                                         ],
-                                        creationDate: SchemaSpecFixture.DATE.toString(),
-                                        paymentDate : SchemaSpecFixture.DATE.toString(),
+                                        creationDate: StaticModelBuilder.DATE.toString(),
+                                        paymentDate : StaticModelBuilder.DATE.toString(),
                                         paid        : true,
                                         items       : [
                                                 [
@@ -191,13 +192,6 @@ class InvoiceSchemaSpec extends Specification {
         @Override
         Object get(DataFetchingEnvironment environment) {
             return new RelayMutationResponse(clientMutationId: "client-mutation-1", invoice: SchemaSpecFixture.build().firstInvoice())
-        }
-
-        class RelayMutationResponse {
-
-            String clientMutationId
-
-            Invoice invoice
         }
     }
 
