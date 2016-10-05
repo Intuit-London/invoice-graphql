@@ -1,7 +1,8 @@
-package com.intuit.workshop.invoicing.graphql
+package com.intuit.workshop.invoicing.graphql.schema
 
-import com.intuit.workshop.invoicing.model.Invoice
-import com.intuit.workshop.invoicing.model.User
+import com.intuit.workshop.invoicing.graphql.schema.input.InputInvoice
+import com.intuit.workshop.invoicing.graphql.schema.output.OutputInvoice
+import com.intuit.workshop.invoicing.graphql.schema.output.OutputUser
 import graphql.annotations.GraphQLAnnotations
 import graphql.relay.Relay
 import graphql.schema.DataFetcher
@@ -13,12 +14,10 @@ import graphql.schema.GraphQLSchema
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Component
 
-import javax.annotation.PostConstruct
+import static graphql.schema.GraphQLInputObjectField.newInputObjectField
 
 @Component
-class GraphQLSchemaHolder {
-
-    GraphQLSchema graphQLSchema
+class InvoiceGraphQLSchemaFactory {
 
     @Autowired
     DataFetcher rootQueryDataFetcher
@@ -26,31 +25,30 @@ class GraphQLSchemaHolder {
     @Autowired
     DataFetcher invoiceMutationDataFetcher
 
-    @PostConstruct
-    void buildGraphQLSchema() {
+    GraphQLSchema build() {
 
-        GraphQLObjectType userType = GraphQLAnnotations.object(User);
-        GraphQLObjectType invoiceType = GraphQLAnnotations.object(Invoice);
+        GraphQLObjectType outputUserType = GraphQLAnnotations.object(OutputUser);
+        GraphQLObjectType outputInvoiceType = GraphQLAnnotations.object(OutputInvoice);
+        GraphQLInputObjectType inputInvoiceType = GraphQLAnnotations.inputObject(GraphQLAnnotations.object(InputInvoice))
 
         GraphQLObjectType queryType = GraphQLObjectType.newObject()
                                                        .name("invoicingRootQuery")
                                                        .field(GraphQLFieldDefinition.newFieldDefinition()
-                                                                                    .type(userType)
+                                                                                    .type(outputUserType)
                                                                                     .name("user")
                                                                                     .dataFetcher(rootQueryDataFetcher)
                                                                                     .build())
                                                        .build();
 
-        GraphQLInputObjectType invoiceInputType = GraphQLAnnotations.inputObject(invoiceType)
-        GraphQLInputObjectField inputInvoiceField = GraphQLInputObjectField.newInputObjectField()
-                                                                           .name("invoice")
-                                                                           .type(invoiceInputType).build()
+        GraphQLInputObjectField inputInvoiceField = newInputObjectField()
+                .name("invoice")
+                .type(inputInvoiceType).build()
 
         GraphQLFieldDefinition invoiceOutputFieldDefinition = GraphQLFieldDefinition.newFieldDefinition()
                                                                                     .name("invoice")
-                                                                                    .type(invoiceType).build()
+                                                                                    .type(outputInvoiceType).build()
 
-        Relay relay = new Relay()
+        Relay relay = new Relay();
         GraphQLFieldDefinition invoiceMutationFieldDefinition = relay.mutationWithClientMutationId("Invoice", "updateInvoice", [inputInvoiceField],
                 [invoiceOutputFieldDefinition], invoiceMutationDataFetcher)
 
@@ -59,12 +57,9 @@ class GraphQLSchemaHolder {
                                                           .field(invoiceMutationFieldDefinition)
                                                           .build();
 
-        graphQLSchema = GraphQLSchema.newSchema()
-                              .query(queryType)
-                              .mutation(mutationType)
-                              .build();
-
+        return GraphQLSchema.newSchema()
+                                     .query(queryType)
+                                     .mutation(mutationType)
+                                     .build();
     }
-
-
 }

@@ -1,5 +1,7 @@
 package com.intuit.workshop.invoicing.graphql
 
+import com.intuit.workshop.invoicing.graphql.introspection.IntrospectionQuery
+import com.intuit.workshop.invoicing.graphql.schema.GraphQLSchemaHolder
 import graphql.ExecutionResult
 import graphql.GraphQL
 import groovy.util.logging.Slf4j
@@ -12,17 +14,17 @@ import javax.annotation.PostConstruct
 @Service
 class GraphQLExecutionService {
 
+    private GraphQL graphQL
+
     @Autowired
     GraphQLSchemaHolder graphQLSchemaHolder
-
-    private GraphQL graphQL
 
     @PostConstruct
     void init() {
         graphQL = new GraphQL(graphQLSchemaHolder.graphQLSchema)
     }
 
-    Map<String, Object> execute(String query, Map<String, Object> variables) {
+    Map<String, Object> execute(String query, Map<String, Object> variables = [:]) {
         ExecutionResult executionResult = graphQL.execute(query, (Object) null, variables ?: [:]);
         Map<String, Object> result = new LinkedHashMap<>();
         if (executionResult.getErrors().size() > 0) {
@@ -32,5 +34,10 @@ class GraphQLExecutionService {
         result.put("data", executionResult.getData());
         return result;
     }
+
+    Map<String, Object> executeIntrospection() {
+        return execute(IntrospectionQuery.QUERY)
+    }
+
 
 }

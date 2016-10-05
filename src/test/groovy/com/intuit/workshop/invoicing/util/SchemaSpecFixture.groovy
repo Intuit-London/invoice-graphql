@@ -1,8 +1,8 @@
 package com.intuit.workshop.invoicing.util
 
 import com.intuit.workshop.invoicing.graphql.fetcher.util.StaticModelBuilder
-import com.intuit.workshop.invoicing.model.Invoice
-import com.intuit.workshop.invoicing.model.User
+import com.intuit.workshop.invoicing.graphql.schema.output.OutputInvoice
+import com.intuit.workshop.invoicing.graphql.schema.output.OutputUser
 
 class SchemaSpecFixture {
 
@@ -59,7 +59,6 @@ mutation InvoiceMutation {
             creationDate: "Sat Jan 01 00:00:00 GMT 2000",
             paymentDate: "Sat Jan 01 00:00:00 GMT 2000",
             paid: true,
-            items: [],
             totalAmount: 100
         }
     }) {
@@ -108,17 +107,17 @@ mutation InvoiceMutation {
 }
 """
 
-    private User user
+    private OutputUser user
 
     static SchemaSpecFixture build() {
         return new SchemaSpecFixture(user: StaticModelBuilder.buildStaticModel())
     }
 
-    User user() {
+    OutputUser user() {
         return user
     }
 
-    Invoice firstInvoice() {
+    OutputInvoice firstInvoice() {
         user.invoices.find { it.id == "invoice-1" }
     }
 

@@ -1,15 +1,12 @@
-package com.intuit.workshop.invoicing.model
+package com.intuit.workshop.invoicing.graphql.schema.base
 
 import graphql.annotations.GraphQLField
 
-class Customer {
+class BaseCustomer {
 
     @GraphQLField
     public String id
 
     @GraphQLField
     public String businessName
-
-    @GraphQLField
-    public List<Invoice> invoices
 }

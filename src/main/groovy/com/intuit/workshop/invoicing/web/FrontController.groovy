@@ -1,6 +1,21 @@
 package com.intuit.workshop.invoicing.web
 
 import com.intuit.workshop.invoicing.graphql.GraphQLExecutionService
+import com.intuit.workshop.invoicing.graphql.schema.output.OutputUser
+import graphql.ExecutionResult
+import graphql.GraphQL
+import graphql.Scalars
+import graphql.annotations.GraphQLAnnotations
+import graphql.annotations.GraphQLField
+import graphql.relay.Relay
+import graphql.schema.DataFetcher
+import graphql.schema.DataFetchingEnvironment
+import graphql.schema.GraphQLArgument
+import graphql.schema.GraphQLFieldDefinition
+import graphql.schema.GraphQLInterfaceType
+import graphql.schema.GraphQLObjectType
+import graphql.schema.GraphQLSchema
+import graphql.schema.TypeResolver
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.http.MediaType
 import org.springframework.stereotype.Controller
@@ -29,9 +44,19 @@ class FrontController {
     )
     @ResponseBody
     Object execute(@RequestBody Map body) {
-        String query = (String)body.get("query")
+        String query = (String) body.get("query")
         Map<String, Object> variables = (Map<String, Object>) body.get("variables");
         return graphQLExecutionService.execute(query, variables);
+    }
+
+    @RequestMapping(
+            value = "/introspection",
+            method = RequestMethod.GET,
+            produces = MediaType.APPLICATION_JSON_VALUE
+    )
+    @ResponseBody
+    Object executeIntrospection() {
+        return graphQLExecutionService.executeIntrospection()
     }
 
 }

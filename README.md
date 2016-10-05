@@ -36,7 +36,7 @@ It should return something similar to:
 {"data":{"user":{"id":"user-1","invoices":[{"id":"invoice-1"},{"id":"invoice-2"}]}}}`
 ```
 
-A query of most of the schema can be seen in the [SchemaSpecFixture](src/test/groovy/com/intuit/workshop/invoicing/util/SchemaSpecFixture.groovy) class.
+A query with most of the schema can be seen in the [SchemaSpecFixture](src/test/groovy/com/intuit/workshop/invoicing/util/SchemaSpecFixture.groovy) class.
 
 ## License
 

@@ -1,8 +1,8 @@
-package com.intuit.workshop.invoicing.model
+package com.intuit.workshop.invoicing.graphql.schema.base
 
 import graphql.annotations.GraphQLField
 
-class User {
+class BaseUser {
 
     @GraphQLField
     public String id
@@ -12,8 +12,4 @@ class User {
 
     @GraphQLField
     public String lastName
-
-    @GraphQLField
-    public List<Invoice> invoices
-
 }

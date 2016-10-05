@@ -1,20 +1,14 @@
-package com.intuit.workshop.invoicing.model
+package com.intuit.workshop.invoicing.graphql.schema.base
 
 import graphql.annotations.GraphQLField
 
-class Invoice {
+class BaseInvoice {
 
     @GraphQLField
     public String id
 
     @GraphQLField
-    public User user
-
-    @GraphQLField
     public Long number
-
-    @GraphQLField
-    public Customer customer
 
     @GraphQLField
     // TODO Date
@@ -28,10 +22,8 @@ class Invoice {
     public Boolean paid
 
     @GraphQLField
-    public List<InvoiceItem> items
-
-    @GraphQLField
     // TODO Amount
     public Integer totalAmount
 
 }
+
