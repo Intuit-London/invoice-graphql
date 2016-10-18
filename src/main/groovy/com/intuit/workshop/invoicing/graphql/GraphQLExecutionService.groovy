@@ -1,9 +1,9 @@
 package com.intuit.workshop.invoicing.graphql
 
-import com.intuit.workshop.invoicing.graphql.introspection.IntrospectionQuery
 import com.intuit.workshop.invoicing.graphql.schema.GraphQLSchemaHolder
 import graphql.ExecutionResult
 import graphql.GraphQL
+import graphql.introspection.IntrospectionQuery
 import groovy.util.logging.Slf4j
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Service
@@ -36,7 +36,7 @@ class GraphQLExecutionService {
     }
 
     Map<String, Object> executeIntrospection() {
-        return execute(IntrospectionQuery.QUERY)
+        return execute(IntrospectionQuery.INTROSPECTION_QUERY)
     }
 
 

@@ -9,8 +9,10 @@ import graphql.schema.DataFetcher
 import graphql.schema.GraphQLFieldDefinition
 import graphql.schema.GraphQLInputObjectField
 import graphql.schema.GraphQLInputObjectType
+import graphql.schema.GraphQLInterfaceType
 import graphql.schema.GraphQLObjectType
 import graphql.schema.GraphQLSchema
+import graphql.schema.TypeResolver
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Component
 
@@ -20,7 +22,10 @@ import static graphql.schema.GraphQLInputObjectField.newInputObjectField
 class InvoiceGraphQLSchemaFactory {
 
     @Autowired
-    DataFetcher rootQueryDataFetcher
+    DataFetcher userQueryDataFetcher
+
+    @Autowired
+    DataFetcher nodeQueryDataFetcher
 
     @Autowired
     DataFetcher invoiceMutationDataFetcher
@@ -31,12 +36,29 @@ class InvoiceGraphQLSchemaFactory {
         GraphQLObjectType outputInvoiceType = GraphQLAnnotations.object(OutputInvoice);
         GraphQLInputObjectType inputInvoiceType = GraphQLAnnotations.inputObject(GraphQLAnnotations.object(InputInvoice))
 
+        Relay relay = new Relay();
+        GraphQLInterfaceType nodeInterfaceType = relay.nodeInterface(
+                new TypeResolver() {
+                    public GraphQLObjectType getType(Object object) {
+                        Relay.ResolvedGlobalId resolvedGlobalId = new Relay().fromGlobalId((String)object.id);
+                        switch (resolvedGlobalId.type) {
+                            case "/User":
+                                return outputUserType
+                            case "/Invoice":
+                                return outputInvoiceType
+                            default:
+                                return null
+                        }
+                    }
+                })
+
         GraphQLObjectType queryType = GraphQLObjectType.newObject()
                                                        .name("invoicingRootQuery")
+                                                       .field(relay.nodeField(nodeInterfaceType, nodeQueryDataFetcher))
                                                        .field(GraphQLFieldDefinition.newFieldDefinition()
                                                                                     .type(outputUserType)
                                                                                     .name("user")
-                                                                                    .dataFetcher(rootQueryDataFetcher)
+                                                                                    .dataFetcher(userQueryDataFetcher)
                                                                                     .build())
                                                        .build();
 
@@ -48,7 +70,6 @@ class InvoiceGraphQLSchemaFactory {
                                                                                     .name("invoice")
                                                                                     .type(outputInvoiceType).build()
 
-        Relay relay = new Relay();
         GraphQLFieldDefinition invoiceMutationFieldDefinition = relay.mutationWithClientMutationId("Invoice", "updateInvoice", [inputInvoiceField],
                 [invoiceOutputFieldDefinition], invoiceMutationDataFetcher)
 
@@ -58,8 +79,9 @@ class InvoiceGraphQLSchemaFactory {
                                                           .build();
 
         return GraphQLSchema.newSchema()
-                                     .query(queryType)
-                                     .mutation(mutationType)
-                                     .build();
+                            .query(queryType)
+                            .mutation(mutationType)
+                            .build();
     }
+
 }

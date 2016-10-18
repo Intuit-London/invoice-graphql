@@ -1,14 +1,15 @@
 package com.intuit.workshop.invoicing
 
-import com.intuit.workshop.invoicing.graphql.fetcher.util.StaticModelBuilder
+import com.intuit.workshop.invoicing.graphql.relay.GlobalIdHelper
+import com.intuit.workshop.invoicing.graphql.repository.util.StaticModelBuilder
 import com.intuit.workshop.invoicing.graphql.schema.InvoiceGraphQLSchemaFactory
 import com.intuit.workshop.invoicing.graphql.schema.output.OutputRelayMutation
 import com.intuit.workshop.invoicing.util.SchemaSpecFixture
+import graphql.ExecutionResult
 import graphql.GraphQL
 import graphql.schema.DataFetcher
 import graphql.schema.DataFetchingEnvironment
 import graphql.schema.GraphQLSchema
-import spock.lang.Ignore
 import spock.lang.Specification
 
 class InvoiceSchemaSpec extends Specification {
@@ -19,27 +20,27 @@ class InvoiceSchemaSpec extends Specification {
         schema = createSchema()
     }
 
-    void "Query the full schema"() {
+    void "Query through the 'user' root field"() {
         expect:
-        Map<String, Object> result = new GraphQL(schema).execute(SchemaSpecFixture.QUERY).getData();
+        Map<String, Object> result = successExecution(SchemaSpecFixture.USER_QUERY).getData();
         result == [
                 user: [
-                        id       : "user-1",
+                        id       : id("/User", "user-1"),
                         firstName: "First",
                         lastName : "User",
                         invoices : [
                                 [
-                                        id          : "invoice-1",
+                                        id          : id("/Invoice", "invoice-1"),
                                         user        : [
-                                                id: "user-1"
+                                                id: id("/User", "user-1")
                                         ],
                                         number      : 1,
                                         customer    : [
-                                                id          : "customer-1",
+                                                id          : id("/Customer", "customer-1"),
                                                 businessName: "First Customer Ever",
                                                 invoices    : [
                                                         [
-                                                                id: "invoice-1"
+                                                                id: id("/Invoice", "invoice-1")
                                                         ]
                                                 ]
 
@@ -49,17 +50,17 @@ class InvoiceSchemaSpec extends Specification {
                                         paid        : true,
                                         items       : [
                                                 [
-                                                        id     : "invoice-1-item-1",
+                                                        id     : id("/InvoiceItem", "invoice-1-item-1"),
                                                         invoice: [
-                                                                id: "invoice-1"
+                                                                id: id("/Invoice", "invoice-1")
                                                         ],
                                                         name   : "Bags",
                                                         price  : 100
                                                 ],
                                                 [
-                                                        id     : "invoice-1-item-2",
+                                                        id     : id("/InvoiceItem", "invoice-1-item-2"),
                                                         invoice: [
-                                                                id: "invoice-1"
+                                                                id: id("/Invoice", "invoice-1")
                                                         ],
                                                         name   : "Gloves",
                                                         price  : 200
@@ -70,17 +71,17 @@ class InvoiceSchemaSpec extends Specification {
                                 ],
                                 [
 
-                                        id          : "invoice-2",
+                                        id          : id("/Invoice", "invoice-2"),
                                         user        : [
-                                                id: "user-1"
+                                                id: id("/User", "user-1")
                                         ],
                                         number      : 2,
                                         customer    : [
-                                                id          : "customer-2",
+                                                id          : id("/Customer", "customer-2"),
                                                 businessName: "Second Customer",
                                                 invoices    : [
                                                         [
-                                                                id: "invoice-2"
+                                                                id: id("/Invoice", "invoice-2")
                                                         ]
                                                 ]
 
@@ -90,9 +91,9 @@ class InvoiceSchemaSpec extends Specification {
                                         paid        : false,
                                         items       : [
                                                 [
-                                                        id     : "invoice-2-item-1",
+                                                        id     : id("/InvoiceItem", "invoice-2-item-1"),
                                                         invoice: [
-                                                                id: "invoice-2"
+                                                                id: id("/Invoice", "invoice-2")
                                                         ],
                                                         name   : "Glasses",
                                                         price  : 50
@@ -105,41 +106,50 @@ class InvoiceSchemaSpec extends Specification {
         ]
     }
 
+    void "Query through the 'node' root field"() {
+        expect:
+        Map<String, Object> result = successExecution(SchemaSpecFixture.NODE_QUERY).getData();
+        result == [
+                node: [
+                        id: id("/User", "user-1")
+                ]
+        ]
+    }
+
     void "Relay-Compliant mutation of a full invoice as an input"() {
         expect:
-        Map<String, Object> result = new GraphQL(schema).execute(SchemaSpecFixture.RELAY_INPUT_MUTATION).getData();
+        Map<String, Object> result = successExecution(SchemaSpecFixture.RELAY_INPUT_MUTATION).getData();
         result == [
                 updateInvoice: [
                         clientMutationId: "client-mutation-1",
                         invoice         :
                                 [
-                                        id: "invoice-1"
+                                        id: id("/Invoice", "invoice-1")
                                 ]
 
                 ]
         ]
     }
 
-    @Ignore("Fix me!")
     void "Relay-Compliant mutation of a full invoice as an output"() {
         expect:
-        Map<String, Object> result = new GraphQL(schema).execute(SchemaSpecFixture.RELAY_OUTPUT_MUTATION).getData();
+        Map<String, Object> result = successExecution(SchemaSpecFixture.RELAY_OUTPUT_MUTATION).getData();
         result == [
                 updateInvoice: [
                         clientMutationId: "client-mutation-1",
                         invoice         :
                                 [
-                                        id          : "invoice-1",
+                                        id          : id("/Invoice", "invoice-1"),
                                         user        : [
-                                                id: "user-1"
+                                                id: id("/User", "user-1")
                                         ],
                                         number      : 1,
                                         customer    : [
-                                                id          : "customer-1",
+                                                id          : id("/Customer", "customer-1"),
                                                 businessName: "First Customer Ever",
                                                 invoices    : [
                                                         [
-                                                                id: "invoice-1"
+                                                                id: id("/Invoice", "invoice-1")
                                                         ]
                                                 ]
 
@@ -149,17 +159,17 @@ class InvoiceSchemaSpec extends Specification {
                                         paid        : true,
                                         items       : [
                                                 [
-                                                        id     : "invoice-1-item-1",
+                                                        id     : id("/InvoiceItem", "invoice-1-item-1"),
                                                         invoice: [
-                                                                id: "invoice-1"
+                                                                id: id("/Invoice", "invoice-1")
                                                         ],
                                                         name   : "Bags",
                                                         price  : 100
                                                 ],
                                                 [
-                                                        id     : "invoice-1-item-2",
+                                                        id     : id("/InvoiceItem", "invoice-1-item-2"),
                                                         invoice: [
-                                                                id: "invoice-1"
+                                                                id: id("/Invoice", "invoice-1")
                                                         ],
                                                         name   : "Gloves",
                                                         price  : 200
@@ -173,14 +183,25 @@ class InvoiceSchemaSpec extends Specification {
         ]
     }
 
+    private ExecutionResult successExecution(String query) {
+        ExecutionResult executionResult = new GraphQL(schema).execute(query)
+        assert executionResult.getErrors() == [], "No errors are expected, but found: ${executionResult.getErrors()}"
+        return executionResult
+    }
+
     private createSchema() {
         InvoiceGraphQLSchemaFactory graphQLSchemaFactory = new InvoiceGraphQLSchemaFactory()
-        graphQLSchemaFactory.rootQueryDataFetcher = new MockRootQueryDataFetcher()
+        graphQLSchemaFactory.userQueryDataFetcher = new MockQueryDataFetcher()
+        graphQLSchemaFactory.nodeQueryDataFetcher = new MockQueryDataFetcher()
         graphQLSchemaFactory.invoiceMutationDataFetcher = new MockMutationDataFetcher()
         return graphQLSchemaFactory.build()
     }
 
-    class MockRootQueryDataFetcher implements DataFetcher {
+    private String id(String type, String id) {
+        return GlobalIdHelper.id(type, id)
+    }
+
+    class MockQueryDataFetcher implements DataFetcher {
 
         @Override
         Object get(DataFetchingEnvironment environment) {

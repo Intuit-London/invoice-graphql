@@ -7,7 +7,7 @@ import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Component
 
 @Component
-class InvoiceMutationDataFetcher implements DataFetcher {
+class UserQueryDataFetcher implements DataFetcher {
 
     @Autowired
     InvoiceRepository repository
@@ -16,5 +16,4 @@ class InvoiceMutationDataFetcher implements DataFetcher {
     Object get(DataFetchingEnvironment environment) {
         return repository.findUsers()
     }
-
 }
