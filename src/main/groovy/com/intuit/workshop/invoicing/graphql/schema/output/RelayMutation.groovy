@@ -1,8 +1,8 @@
 package com.intuit.workshop.invoicing.graphql.schema.output
 
-class OutputRelayMutation {
+class RelayMutation {
 
     String clientMutationId
 
-    OutputInvoice invoice
+    Invoice invoice
 }

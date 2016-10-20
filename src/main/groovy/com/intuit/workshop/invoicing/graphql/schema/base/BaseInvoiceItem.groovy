@@ -2,7 +2,7 @@ package com.intuit.workshop.invoicing.graphql.schema.base
 
 import graphql.annotations.GraphQLField
 
-class BaseInvoiceItem {
+class BaseInvoiceItem implements Entity {
 
     @GraphQLField
     public String id

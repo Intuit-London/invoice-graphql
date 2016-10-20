@@ -3,8 +3,8 @@ package com.intuit.workshop.invoicing.graphql.schema.output
 import com.intuit.workshop.invoicing.graphql.schema.base.BaseCustomer
 import graphql.annotations.GraphQLField
 
-class OutputCustomer extends BaseCustomer {
+class Customer extends BaseCustomer {
 
     @GraphQLField
-    public List<OutputInvoice> invoices
+    public List<Invoice> invoices
 }

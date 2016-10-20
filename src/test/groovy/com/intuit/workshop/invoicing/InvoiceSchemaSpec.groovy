@@ -3,7 +3,7 @@ package com.intuit.workshop.invoicing
 import com.intuit.workshop.invoicing.graphql.relay.GlobalIdHelper
 import com.intuit.workshop.invoicing.graphql.repository.util.StaticModelBuilder
 import com.intuit.workshop.invoicing.graphql.schema.InvoiceGraphQLSchemaFactory
-import com.intuit.workshop.invoicing.graphql.schema.output.OutputRelayMutation
+import com.intuit.workshop.invoicing.graphql.schema.output.RelayMutation
 import com.intuit.workshop.invoicing.util.SchemaSpecFixture
 import graphql.ExecutionResult
 import graphql.GraphQL
@@ -24,84 +24,87 @@ class InvoiceSchemaSpec extends Specification {
         expect:
         Map<String, Object> result = successExecution(SchemaSpecFixture.USER_QUERY).getData();
         result == [
-                user: [
-                        id       : id("/User", "user-1"),
-                        firstName: "First",
-                        lastName : "User",
-                        invoices : [
-                                [
-                                        id          : id("/Invoice", "invoice-1"),
-                                        user        : [
-                                                id: id("/User", "user-1")
-                                        ],
-                                        number      : 1,
-                                        customer    : [
-                                                id          : id("/Customer", "customer-1"),
-                                                businessName: "First Customer Ever",
-                                                invoices    : [
-                                                        [
-                                                                id: id("/Invoice", "invoice-1")
-                                                        ]
-                                                ]
+                users: [
+                        [
 
-                                        ],
-                                        creationDate: StaticModelBuilder.DATE.toString(),
-                                        paymentDate : StaticModelBuilder.DATE.toString(),
-                                        paid        : true,
-                                        items       : [
-                                                [
-                                                        id     : id("/InvoiceItem", "invoice-1-item-1"),
-                                                        invoice: [
-                                                                id: id("/Invoice", "invoice-1")
-                                                        ],
-                                                        name   : "Bags",
-                                                        price  : 100
+                                id       : id("/User", "user-1"),
+                                firstName: "First",
+                                lastName : "User",
+                                invoices : [
+                                        [
+                                                id          : id("/Invoice", "invoice-1"),
+                                                user        : [
+                                                        id: id("/User", "user-1")
                                                 ],
-                                                [
-                                                        id     : id("/InvoiceItem", "invoice-1-item-2"),
-                                                        invoice: [
-                                                                id: id("/Invoice", "invoice-1")
-                                                        ],
-                                                        name   : "Gloves",
-                                                        price  : 200
-                                                ]
-                                        ],
-                                        totalAmount : 300
-
-                                ],
-                                [
-
-                                        id          : id("/Invoice", "invoice-2"),
-                                        user        : [
-                                                id: id("/User", "user-1")
-                                        ],
-                                        number      : 2,
-                                        customer    : [
-                                                id          : id("/Customer", "customer-2"),
-                                                businessName: "Second Customer",
-                                                invoices    : [
-                                                        [
-                                                                id: id("/Invoice", "invoice-2")
+                                                number      : 1,
+                                                customer    : [
+                                                        id          : id("/Customer", "customer-1"),
+                                                        businessName: "First Customer Ever",
+                                                        invoices    : [
+                                                                [
+                                                                        id: id("/Invoice", "invoice-1")
+                                                                ]
                                                         ]
-                                                ]
+
+                                                ],
+                                                creationDate: StaticModelBuilder.DATE.toString(),
+                                                paymentDate : StaticModelBuilder.DATE.toString(),
+                                                paid        : true,
+                                                items       : [
+                                                        [
+                                                                id     : id("/InvoiceItem", "invoice-1-item-1"),
+                                                                invoice: [
+                                                                        id: id("/Invoice", "invoice-1")
+                                                                ],
+                                                                name   : "Bags",
+                                                                price  : 100
+                                                        ],
+                                                        [
+                                                                id     : id("/InvoiceItem", "invoice-1-item-2"),
+                                                                invoice: [
+                                                                        id: id("/Invoice", "invoice-1")
+                                                                ],
+                                                                name   : "Gloves",
+                                                                price  : 200
+                                                        ]
+                                                ],
+                                                totalAmount : 300
 
                                         ],
-                                        creationDate: StaticModelBuilder.DATE.toString(),
-                                        paymentDate : null,
-                                        paid        : false,
-                                        items       : [
-                                                [
-                                                        id     : id("/InvoiceItem", "invoice-2-item-1"),
-                                                        invoice: [
-                                                                id: id("/Invoice", "invoice-2")
-                                                        ],
-                                                        name   : "Glasses",
-                                                        price  : 50
+                                        [
+
+                                                id          : id("/Invoice", "invoice-2"),
+                                                user        : [
+                                                        id: id("/User", "user-1")
                                                 ],
-                                        ],
-                                        totalAmount : 50
+                                                number      : 2,
+                                                customer    : [
+                                                        id          : id("/Customer", "customer-2"),
+                                                        businessName: "Second Customer",
+                                                        invoices    : [
+                                                                [
+                                                                        id: id("/Invoice", "invoice-2")
+                                                                ]
+                                                        ]
+
+                                                ],
+                                                creationDate: StaticModelBuilder.DATE.toString(),
+                                                paymentDate : null,
+                                                paid        : false,
+                                                items       : [
+                                                        [
+                                                                id     : id("/InvoiceItem", "invoice-2-item-1"),
+                                                                invoice: [
+                                                                        id: id("/Invoice", "invoice-2")
+                                                                ],
+                                                                name   : "Glasses",
+                                                                price  : 50
+                                                        ],
+                                                ],
+                                                totalAmount : 50
+                                        ]
                                 ]
-                        ],
+                        ]
                 ]
         ]
     }
@@ -191,8 +194,8 @@ class InvoiceSchemaSpec extends Specification {
 
     private createSchema() {
         InvoiceGraphQLSchemaFactory graphQLSchemaFactory = new InvoiceGraphQLSchemaFactory()
-        graphQLSchemaFactory.userQueryDataFetcher = new MockQueryDataFetcher()
-        graphQLSchemaFactory.nodeQueryDataFetcher = new MockQueryDataFetcher()
+        graphQLSchemaFactory.userQueryDataFetcher = new MockRootQueryDataFetcher()
+        graphQLSchemaFactory.nodeQueryDataFetcher = new MockNodeQueryDataFetcher()
         graphQLSchemaFactory.invoiceMutationDataFetcher = new MockMutationDataFetcher()
         return graphQLSchemaFactory.build()
     }
@@ -201,19 +204,28 @@ class InvoiceSchemaSpec extends Specification {
         return GlobalIdHelper.id(type, id)
     }
 
-    class MockQueryDataFetcher implements DataFetcher {
+    class MockRootQueryDataFetcher implements DataFetcher {
 
         @Override
         Object get(DataFetchingEnvironment environment) {
-            return SchemaSpecFixture.build().user()
+            return SchemaSpecFixture.build().users()
         }
+    }
+
+    class MockNodeQueryDataFetcher implements DataFetcher {
+
+        @Override
+        Object get(DataFetchingEnvironment environment) {
+            return SchemaSpecFixture.build().users().first()
+        }
+
     }
 
     class MockMutationDataFetcher implements DataFetcher {
 
         @Override
         Object get(DataFetchingEnvironment environment) {
-            return new OutputRelayMutation(clientMutationId: "client-mutation-1", invoice: SchemaSpecFixture.build().firstInvoice())
+            return new RelayMutation(clientMutationId: "client-mutation-1", invoice: SchemaSpecFixture.build().firstInvoice())
         }
     }
 
