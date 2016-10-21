@@ -1,9 +1,9 @@
 package com.intuit.workshop.invoicing
 
 import com.intuit.workshop.invoicing.graphql.relay.GlobalIdHelper
-import com.intuit.workshop.invoicing.graphql.repository.util.StaticModelBuilder
+import com.intuit.workshop.invoicing.domain.repository.util.StaticModelBuilder
 import com.intuit.workshop.invoicing.graphql.schema.InvoiceGraphQLSchemaFactory
-import com.intuit.workshop.invoicing.graphql.schema.output.RelayMutation
+import com.intuit.workshop.invoicing.graphql.schema.RelayMutation
 import com.intuit.workshop.invoicing.util.SchemaSpecFixture
 import graphql.ExecutionResult
 import graphql.GraphQL

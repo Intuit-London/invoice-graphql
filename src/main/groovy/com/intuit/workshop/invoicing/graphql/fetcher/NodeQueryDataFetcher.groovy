@@ -1,7 +1,7 @@
 package com.intuit.workshop.invoicing.graphql.fetcher
 
 import com.intuit.workshop.invoicing.graphql.relay.GlobalIdHelper
-import com.intuit.workshop.invoicing.graphql.repository.InvoiceRepository
+import com.intuit.workshop.invoicing.domain.repository.InvoiceRepository
 import graphql.relay.Relay
 import graphql.schema.DataFetcher
 import graphql.schema.DataFetchingEnvironment
@@ -14,17 +14,17 @@ class NodeQueryDataFetcher implements DataFetcher {
     @Autowired
     InvoiceRepository repository
 
+    private final Map<String, Closure> ACTIONS = [
+            "/User": { String id -> repository.getUserById(id) },
+            "/Customer": { String id -> repository.getCustomerById(id) },
+            "/Invoice": { String id -> repository.getInvoiceById(id) },
+            "/InvoiceItem": { String id -> repository.getInvoiceItemById(id) },
+    ]
+
     @Override
     Object get(DataFetchingEnvironment environment) {
         String globalId = (String)environment.arguments.id
         Relay.ResolvedGlobalId resolvedGlobalId = GlobalIdHelper.fromId(globalId)
-        switch (resolvedGlobalId.type) {
-            case "/User":
-                return repository.getUserById(globalId)
-            case "/Invoice":
-                return repository.getInvoiceById(globalId)
-            default:
-                return null
-        }
+        return ACTIONS[resolvedGlobalId.type]?.call(globalId)
     }
 }

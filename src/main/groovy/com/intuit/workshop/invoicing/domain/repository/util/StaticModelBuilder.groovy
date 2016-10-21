@@ -1,10 +1,10 @@
-package com.intuit.workshop.invoicing.graphql.repository.util
+package com.intuit.workshop.invoicing.domain.repository.util
 
 import com.intuit.workshop.invoicing.graphql.relay.GlobalIdHelper
-import com.intuit.workshop.invoicing.graphql.schema.output.Customer
-import com.intuit.workshop.invoicing.graphql.schema.output.Invoice
-import com.intuit.workshop.invoicing.graphql.schema.output.InvoiceItem
-import com.intuit.workshop.invoicing.graphql.schema.output.User
+import com.intuit.workshop.invoicing.domain.entity.Customer
+import com.intuit.workshop.invoicing.domain.entity.Invoice
+import com.intuit.workshop.invoicing.domain.entity.InvoiceItem
+import com.intuit.workshop.invoicing.domain.entity.User
 
 import java.text.SimpleDateFormat
 

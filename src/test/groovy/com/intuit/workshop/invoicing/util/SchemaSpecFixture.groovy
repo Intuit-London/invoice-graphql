@@ -1,9 +1,9 @@
 package com.intuit.workshop.invoicing.util
 
 import com.intuit.workshop.invoicing.graphql.relay.GlobalIdHelper
-import com.intuit.workshop.invoicing.graphql.repository.util.StaticModelBuilder
-import com.intuit.workshop.invoicing.graphql.schema.output.Invoice
-import com.intuit.workshop.invoicing.graphql.schema.output.User
+import com.intuit.workshop.invoicing.domain.repository.util.StaticModelBuilder
+import com.intuit.workshop.invoicing.domain.entity.Invoice
+import com.intuit.workshop.invoicing.domain.entity.User
 
 class SchemaSpecFixture {
 
