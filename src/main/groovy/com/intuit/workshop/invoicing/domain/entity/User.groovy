@@ -2,12 +2,12 @@ package com.intuit.workshop.invoicing.domain.entity
 
 class User implements Entity {
 
-    public String id
+    String id
 
-    public String firstName
+    String firstName
 
-    public String lastName
+    String lastName
 
-    public List<Invoice> invoices
+    List<Invoice> invoices = []
 
 }

@@ -60,7 +60,7 @@ mutation InvoiceMutation {
         clientMutationId: "client-mutation-1",
         invoice: {
             user: {
-                id: "user-1"
+                id: "${GlobalIdHelper.id("/User", "user-1")}"
             },
             number: 1234,
             customer: {
@@ -79,7 +79,6 @@ mutation InvoiceMutation {
     }
 }
 """
-
     static final String RELAY_OUTPUT_MUTATION =
             """
 mutation InvoiceMutation {

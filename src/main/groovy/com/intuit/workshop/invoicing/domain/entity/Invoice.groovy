@@ -2,25 +2,25 @@ package com.intuit.workshop.invoicing.domain.entity
 
 class Invoice implements Entity {
 
-    public String id
+    String id
 
-    public Long number
-
-    // TODO Date
-    public String creationDate
+    Long number
 
     // TODO Date
-    public String paymentDate
+    String creationDate
 
-    public Boolean paid
+    // TODO Date
+    String paymentDate
+
+    Boolean paid
 
     // TODO Amount
-    public Integer totalAmount
+    Integer totalAmount
 
-    public User user
+    User user
 
-    public Customer customer
+    Customer customer
 
-    public List<InvoiceItem> items
+    List<InvoiceItem> items = []
 
 }

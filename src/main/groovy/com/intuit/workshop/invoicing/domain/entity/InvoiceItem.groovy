@@ -2,13 +2,13 @@ package com.intuit.workshop.invoicing.domain.entity
 
 class InvoiceItem implements Entity {
 
-    public Invoice invoice
+    String id
 
-    public String id
+    Invoice invoice
 
-    public String name
+    String name
 
     // TODO Amount
-    public Integer price
+    Integer price
 
 }
