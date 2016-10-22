@@ -1,6 +1,6 @@
 package com.intuit.workshop.invoicing
 
-import com.intuit.workshop.invoicing.graphql.relay.GlobalIdHelper
+import com.intuit.workshop.invoicing.domain.entity.id.GlobalIdHelper
 import com.intuit.workshop.invoicing.domain.repository.util.StaticModelBuilder
 import com.intuit.workshop.invoicing.graphql.schema.InvoiceGraphQLSchemaFactory
 import com.intuit.workshop.invoicing.graphql.schema.RelayMutation
@@ -119,9 +119,24 @@ class InvoiceSchemaSpec extends Specification {
         ]
     }
 
-    void "Relay-Compliant mutation of a full invoice as an input"() {
+    void "Relay-Compliant create mutation of a full invoice as an input"() {
         expect:
-        Map<String, Object> result = successExecution(SchemaSpecFixture.RELAY_INPUT_MUTATION).getData();
+        Map<String, Object> result = successExecution(SchemaSpecFixture.RELAY_CREATE_MUTATION).getData();
+        result == [
+                createInvoice: [
+                        clientMutationId: "client-mutation-1",
+                        invoice         :
+                                [
+                                        id: id("/Invoice", "invoice-1")
+                                ]
+
+                ]
+        ]
+    }
+
+    void "Relay-Compliant update mutation of a full invoice as an input"() {
+        expect:
+        Map<String, Object> result = successExecution(SchemaSpecFixture.RELAY_INPUT_UPDATE_MUTATION).getData();
         result == [
                 updateInvoice: [
                         clientMutationId: "client-mutation-1",
@@ -136,7 +151,7 @@ class InvoiceSchemaSpec extends Specification {
 
     void "Relay-Compliant mutation of a full invoice as an output"() {
         expect:
-        Map<String, Object> result = successExecution(SchemaSpecFixture.RELAY_OUTPUT_MUTATION).getData();
+        Map<String, Object> result = successExecution(SchemaSpecFixture.RELAY_OUTPUT_UPDATE_MUTATION).getData();
         result == [
                 updateInvoice: [
                         clientMutationId: "client-mutation-1",
@@ -196,7 +211,8 @@ class InvoiceSchemaSpec extends Specification {
         InvoiceGraphQLSchemaFactory graphQLSchemaFactory = new InvoiceGraphQLSchemaFactory()
         graphQLSchemaFactory.userQueryDataFetcher = new MockRootQueryDataFetcher()
         graphQLSchemaFactory.nodeQueryDataFetcher = new MockNodeQueryDataFetcher()
-        graphQLSchemaFactory.invoiceMutationDataFetcher = new MockMutationDataFetcher()
+        graphQLSchemaFactory.createInvoiceMutationDataFetcher = new MockMutationDataFetcher()
+        graphQLSchemaFactory.updateInvoiceMutationDataFetcher = new MockMutationDataFetcher()
         return graphQLSchemaFactory.build()
     }
 

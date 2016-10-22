@@ -1,5 +1,6 @@
 package com.intuit.workshop.invoicing.graphql.schema
 
+import com.intuit.workshop.invoicing.domain.entity.id.EntityType
 import graphql.Scalars
 import graphql.relay.Relay
 import graphql.schema.DataFetcher
@@ -27,7 +28,10 @@ class InvoiceGraphQLSchemaFactory {
     DataFetcher nodeQueryDataFetcher
 
     @Autowired
-    DataFetcher invoiceMutationDataFetcher
+    DataFetcher createInvoiceMutationDataFetcher
+
+    @Autowired
+    DataFetcher updateInvoiceMutationDataFetcher
 
     GraphQLSchema build() {
 
@@ -41,14 +45,14 @@ class InvoiceGraphQLSchemaFactory {
                 new TypeResolver() {
                     public GraphQLObjectType getType(Object object) {
                         Relay.ResolvedGlobalId resolvedGlobalId = new Relay().fromGlobalId((String) object.id);
-                        switch (resolvedGlobalId.type) {
-                            case "/User":
+                        switch (EntityType.fromType(resolvedGlobalId.type)) {
+                            case EntityType.USER:
                                 return OutputUserType
-                            case "/Invoice":
+                            case EntityType.INVOICE:
                                 return OutputInvoiceType
-                            case "/InvoiceItem":
+                            case EntityType.INVOICE_ITEM:
                                 return OutputInvoiceItemType
-                            case "/Customer":
+                            case EntityType.CUSTOMER:
                                 return OutputCustomerType
                             default:
                                 return null
@@ -246,7 +250,7 @@ class InvoiceGraphQLSchemaFactory {
                 [GraphQLFieldDefinition.newFieldDefinition()
                                        .name("invoice")
                                        .type(OutputInvoiceType).build()],
-                invoiceMutationDataFetcher)
+                createInvoiceMutationDataFetcher)
 
         GraphQLFieldDefinition updateInvoiceInputMutationDefinition = relay.mutationWithClientMutationId(
                 "Invoice", "updateInvoice",
@@ -256,7 +260,7 @@ class InvoiceGraphQLSchemaFactory {
                 [GraphQLFieldDefinition.newFieldDefinition()
                                        .name("invoice")
                                        .type(OutputInvoiceType).build()],
-                invoiceMutationDataFetcher)
+                updateInvoiceMutationDataFetcher)
 
         GraphQLObjectType mutationType = GraphQLObjectType.newObject()
                                                           .name("invoicingMutation")

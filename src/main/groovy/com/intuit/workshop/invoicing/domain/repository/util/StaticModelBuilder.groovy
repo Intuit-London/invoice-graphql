@@ -1,6 +1,6 @@
 package com.intuit.workshop.invoicing.domain.repository.util
 
-import com.intuit.workshop.invoicing.graphql.relay.GlobalIdHelper
+import com.intuit.workshop.invoicing.domain.entity.id.GlobalIdHelper
 import com.intuit.workshop.invoicing.domain.entity.Customer
 import com.intuit.workshop.invoicing.domain.entity.Invoice
 import com.intuit.workshop.invoicing.domain.entity.InvoiceItem

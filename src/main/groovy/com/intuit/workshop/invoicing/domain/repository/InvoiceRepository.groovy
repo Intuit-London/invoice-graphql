@@ -1,11 +1,11 @@
 package com.intuit.workshop.invoicing.domain.repository
 
 import com.intuit.workshop.invoicing.domain.entity.Customer
-import com.intuit.workshop.invoicing.domain.entity.Entity
 import com.intuit.workshop.invoicing.domain.entity.InvoiceItem
 import com.intuit.workshop.invoicing.domain.repository.util.StaticModelBuilder
 import com.intuit.workshop.invoicing.domain.entity.Invoice
 import com.intuit.workshop.invoicing.domain.entity.User
+import com.intuit.workshop.invoicing.domain.entity.id.GlobalIdHelper
 import groovy.util.logging.Slf4j
 import org.springframework.stereotype.Repository
 import org.springframework.util.Assert
@@ -51,13 +51,15 @@ class InvoiceRepository {
         User user = getUserById(invoice.user?.id)
         Assert.notNull(user, "Can't save invoice: parent not found")
         id(invoice)
-        user.invoices.remove { it.id == invoice.id }
+        invoice.user = user
+        user.invoices.removeAll { it.id.equals(invoice.id) }
         user.invoices.add(invoice)
         return invoice
     }
 
     private static void id(entity)  {
-        entity.id = entity.id ?: UUID.randomUUID()
+        GlobalIdHelper.validate(entity.id)
+        entity.id = entity.id ?: GlobalIdHelper.entityId(entity, UUID.randomUUID().toString())
     }
 
 }

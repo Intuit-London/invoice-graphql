@@ -10,7 +10,7 @@ import org.springframework.stereotype.Component
 import org.springframework.util.Assert
 
 @Component
-class InvoiceMutationDataFetcher implements DataFetcher {
+class CreateInvoiceMutationDataFetcher implements DataFetcher {
 
     @Autowired
     InvoiceService service
@@ -19,8 +19,7 @@ class InvoiceMutationDataFetcher implements DataFetcher {
     Object get(DataFetchingEnvironment environment) {
         Map input = (Map)environment.arguments.input
         Assert.notNull(input, "Input can not be null")
-        Invoice invoice = new Invoice(input?.invoice ?: [:])
-        invoice = service.createInvoice(invoice)
+        Invoice invoice = service.createInvoice(input?.invoice ?: [:])
         return new RelayMutation(clientMutationId: input.clientMutationId, invoice: invoice)
     }
 

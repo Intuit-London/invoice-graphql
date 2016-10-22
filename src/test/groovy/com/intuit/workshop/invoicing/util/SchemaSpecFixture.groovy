@@ -1,6 +1,6 @@
 package com.intuit.workshop.invoicing.util
 
-import com.intuit.workshop.invoicing.graphql.relay.GlobalIdHelper
+import com.intuit.workshop.invoicing.domain.entity.id.GlobalIdHelper
 import com.intuit.workshop.invoicing.domain.repository.util.StaticModelBuilder
 import com.intuit.workshop.invoicing.domain.entity.Invoice
 import com.intuit.workshop.invoicing.domain.entity.User
@@ -53,7 +53,34 @@ class SchemaSpecFixture {
 }
 """
 
-    static final String RELAY_INPUT_MUTATION =
+    static final String RELAY_CREATE_MUTATION =
+            """
+mutation InvoiceMutation {
+    createInvoice(input: {
+        clientMutationId: "client-mutation-1",
+        invoice: {
+            user: {
+                id: "${GlobalIdHelper.id("/User", "user-1")}"
+            },
+            number: 1234,
+            customer: {
+                id: "customer-2"
+            },
+            creationDate: "Sat Jan 01 00:00:00 GMT 2000",
+            paymentDate: "Sat Jan 01 00:00:00 GMT 2000",
+            paid: true,
+            totalAmount: 100
+        }
+    }) {
+        clientMutationId
+        invoice {
+            id
+        }
+    }
+}
+"""
+
+    static final String RELAY_INPUT_UPDATE_MUTATION =
             """
 mutation InvoiceMutation {
     updateInvoice(input: {
@@ -79,7 +106,8 @@ mutation InvoiceMutation {
     }
 }
 """
-    static final String RELAY_OUTPUT_MUTATION =
+
+    static final String RELAY_OUTPUT_UPDATE_MUTATION =
             """
 mutation InvoiceMutation {
     updateInvoice(input: {
