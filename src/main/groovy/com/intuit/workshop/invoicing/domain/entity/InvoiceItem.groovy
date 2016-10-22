@@ -11,7 +11,6 @@ class InvoiceItem implements Entity {
 
     String name
 
-    // TODO Amount
-    Integer price
+    BigDecimal price
 
 }

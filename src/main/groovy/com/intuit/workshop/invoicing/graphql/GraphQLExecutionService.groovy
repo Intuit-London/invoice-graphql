@@ -1,6 +1,7 @@
 package com.intuit.workshop.invoicing.graphql
 
 import com.intuit.workshop.invoicing.graphql.schema.GraphQLSchemaHolder
+import graphql.ExceptionWhileDataFetching
 import graphql.ExecutionResult
 import graphql.GraphQL
 import graphql.introspection.IntrospectionQuery
@@ -25,13 +26,18 @@ class GraphQLExecutionService {
     }
 
     Map<String, Object> execute(String query, Map<String, Object> variables = [:]) {
-        ExecutionResult executionResult = graphQL.execute(query, (Object) null, variables ?: [:]);
         Map<String, Object> result = new LinkedHashMap<>();
-        if (executionResult.getErrors().size() > 0) {
-            result.put("errors", executionResult.getErrors());
-            log.error("Errors: {}", executionResult.getErrors());
+        try {
+            ExecutionResult executionResult = graphQL.execute(query, (Object) null, variables ?: [:]);
+            if (executionResult.getErrors().size() > 0) {
+                result.put("errors", executionResult.getErrors());
+                log.error("Errors: {}", executionResult.getErrors());
+            }
+            result.put("data", executionResult.getData());
+        } catch (Exception exception) {
+            log.error("Error executing GraphQL query", exception)
+            result.put("errors", [new ExceptionWhileDataFetching(exception)])
         }
-        result.put("data", executionResult.getData());
         return result;
     }
 

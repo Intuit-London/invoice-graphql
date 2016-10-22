@@ -17,8 +17,7 @@ class Invoice implements Entity {
 
     Boolean paid
 
-    // TODO Amount
-    Integer totalAmount
+    BigDecimal totalAmount
 
     User user
 
