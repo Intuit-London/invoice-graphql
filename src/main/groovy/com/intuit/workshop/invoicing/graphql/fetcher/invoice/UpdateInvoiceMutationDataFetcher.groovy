@@ -1,4 +1,4 @@
-package com.intuit.workshop.invoicing.graphql.fetcher
+package com.intuit.workshop.invoicing.graphql.fetcher.invoice
 
 import com.intuit.workshop.invoicing.domain.entity.Invoice
 import com.intuit.workshop.invoicing.domain.service.InvoiceService

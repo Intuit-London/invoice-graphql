@@ -1,5 +1,6 @@
 package com.intuit.workshop.invoicing.util
 
+import com.intuit.workshop.invoicing.domain.entity.InvoiceItem
 import com.intuit.workshop.invoicing.domain.entity.id.GlobalIdHelper
 import com.intuit.workshop.invoicing.domain.repository.util.StaticModelBuilder
 import com.intuit.workshop.invoicing.domain.entity.Invoice
@@ -53,7 +54,7 @@ class SchemaSpecFixture {
 }
 """
 
-    static final String RELAY_CREATE_MUTATION =
+    static final String RELAY_CREATE_INVOICE_MUTATION =
             """
 mutation InvoiceMutation {
     createInvoice(input: {
@@ -107,6 +108,49 @@ mutation InvoiceMutation {
 }
 """
 
+    static final String RELAY_CREATE_INVOICE_ITEM_MUTATION =
+            """
+mutation InvoiceMutation {
+    createInvoiceItem(input: {
+        clientMutationId: "client-mutation-1",
+        invoiceItem: {
+            invoice: {
+                id: "${GlobalIdHelper.id("/Invoice", "invoice-1")}"
+            },
+            name: "Food",
+            price: 100
+        }
+    }) {
+        clientMutationId
+        invoiceItem {
+            id
+        }
+    }
+}
+"""
+
+    static final String RELAY_UPDATE_INVOICE_ITEM_MUTATION =
+            """
+mutation InvoiceMutation {
+    updateInvoiceItem(input: {
+        clientMutationId: "client-mutation-1",
+        invoiceItem: {
+            id: "${GlobalIdHelper.id("/InvoiceItem", "invoice-1-item1")}"
+            invoice: {
+                id: "${GlobalIdHelper.id("/Invoice", "invoice-1")}"
+            },
+            name: "Food",
+            price: 1000
+        }
+    }) {
+        clientMutationId
+        invoiceItem {
+            id
+        }
+    }
+}
+"""
+
     static final String RELAY_OUTPUT_UPDATE_MUTATION =
             """
 mutation InvoiceMutation {
@@ -152,6 +196,10 @@ mutation InvoiceMutation {
 
     Invoice firstInvoice() {
         return (Invoice) users.collect { it.invoices }.flatten().find { it.id == GlobalIdHelper.id("/Invoice", "invoice-1") }
+    }
+
+    InvoiceItem firstInvoiceItem() {
+        return firstInvoice().items.find { it.id == GlobalIdHelper.id("/InvoiceItem", "invoice-1-item-1")}
     }
 
     static SchemaSpecFixture build() {

@@ -1,6 +1,7 @@
 package com.intuit.workshop.invoicing.domain.service
 
 import com.intuit.workshop.invoicing.domain.entity.Invoice
+import com.intuit.workshop.invoicing.domain.entity.InvoiceItem
 import com.intuit.workshop.invoicing.domain.repository.InvoiceRepository
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Component
@@ -18,11 +19,24 @@ class InvoiceService {
     }
 
     Invoice updateInvoice(Map properties) {
-        Invoice persistedInvoice = repository.getInvoiceById(properties.id).clone()
+        Invoice persistedInvoice = (Invoice)repository.getInvoiceById(properties.id).clone()
         Assert.notNull(persistedInvoice, "Can not find the invoice to update (ID: ${properties.id})")
         merge(properties, persistedInvoice)
         Invoice invoice = repository.saveInvoice(persistedInvoice)
-        repository.getInvoiceById(invoice)
+        return repository.getInvoiceById(invoice.id)
+    }
+
+    InvoiceItem createInvoiceItem(Map properties) {
+        InvoiceItem invoiceItem = repository.saveInvoiceItem(new InvoiceItem(properties))
+        return repository.getInvoiceItemById(invoiceItem.id)
+    }
+
+    InvoiceItem updateInvoiceItem(Map properties) {
+        InvoiceItem persistedInvoiceItem = (InvoiceItem)repository.getInvoiceItemById(properties.id).clone()
+        Assert.notNull(persistedInvoiceItem, "Can not find the invoice item to update (ID: ${properties.id})")
+        merge(properties, persistedInvoiceItem)
+        InvoiceItem invoiceItem = repository.saveInvoiceItem(persistedInvoiceItem)
+        return repository.getInvoiceItemById(invoiceItem.id)
     }
 
     /**

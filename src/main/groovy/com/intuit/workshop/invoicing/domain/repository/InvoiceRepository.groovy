@@ -57,6 +57,16 @@ class InvoiceRepository {
         return invoice
     }
 
+    InvoiceItem saveInvoiceItem(InvoiceItem invoiceItem) {
+        Invoice invoice = getInvoiceById(invoiceItem.invoice?.id)
+        Assert.notNull(invoice, "Can't save invoice item: parent not found")
+        id(invoiceItem)
+        invoiceItem.invoice = invoice
+        invoice.items.removeAll { it.id.equals(invoiceItem.id) }
+        invoice.items.add(invoiceItem)
+        return invoiceItem
+    }
+
     private static void id(entity)  {
         GlobalIdHelper.validate(entity.id)
         entity.id = entity.id ?: GlobalIdHelper.entityId(entity, UUID.randomUUID().toString())

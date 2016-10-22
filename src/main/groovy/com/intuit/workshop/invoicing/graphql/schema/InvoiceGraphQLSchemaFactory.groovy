@@ -33,6 +33,12 @@ class InvoiceGraphQLSchemaFactory {
     @Autowired
     DataFetcher updateInvoiceMutationDataFetcher
 
+    @Autowired
+    DataFetcher createInvoiceItemMutationDataFetcher
+
+    @Autowired
+    DataFetcher updateInvoiceItemMutationDataFetcher
+
     GraphQLSchema build() {
 
         GraphQLObjectType OutputUserType = null
@@ -81,6 +87,17 @@ class InvoiceGraphQLSchemaFactory {
                                               .withInterface(NodeInterfaceType)
                                               .build()
 
+        Map<String, GraphQLFieldDefinition> commonInvoiceItemFieldDefinitions = [
+                "name" : GraphQLFieldDefinition.newFieldDefinition()
+                                               .name("name")
+                                               .type(Scalars.GraphQLString)
+                                               .build(),
+                "price": GraphQLFieldDefinition.newFieldDefinition()
+                                               .name("price")
+                                               .type(Scalars.GraphQLBigDecimal)
+                                               .build()
+        ]
+
         OutputInvoiceItemType = GraphQLObjectType.newObject()
                                                  .name("InvoiceItem")
                                                  .field(GraphQLFieldDefinition.newFieldDefinition()
@@ -88,15 +105,8 @@ class InvoiceGraphQLSchemaFactory {
                                                                               .type(new GraphQLNonNull(Scalars.GraphQLID))
                                                                               .build())
 
-                                                 .field(GraphQLFieldDefinition.newFieldDefinition()
-                                                                              .name("name")
-                                                                              .type(Scalars.GraphQLString)
-                                                                              .build())
-
-                                                 .field(GraphQLFieldDefinition.newFieldDefinition()
-                                                                              .name("price")
-                                                                              .type(Scalars.GraphQLBigDecimal)
-                                                                              .build())
+                                                 .field(commonInvoiceItemFieldDefinitions["name"])
+                                                 .field(commonInvoiceItemFieldDefinitions["price"])
 
                                                  .field(GraphQLFieldDefinition.newFieldDefinition()
                                                                               .name("invoice")
@@ -192,45 +202,9 @@ class InvoiceGraphQLSchemaFactory {
                                           .withInterface(NodeInterfaceType)
                                           .build()
 
-        // Not recursion yet on self-referencing objects for inputs (see https://github.com/graphql-java/graphql-java/issues/172)
-        // so GraphQLTypeReference can not be used as input objects yet
-        GraphQLInputObjectType InputInvoiceType = GraphQLInputObjectType.newInputObject()
-                                                                        .name("InputInvoice")
+        GraphQLInputObjectType InputInvoiceType = InputInvoiceType(commonInvoiceFieldDefinitions)
+        GraphQLInputObjectType InputInvoiceItemType = InputItemInvoiceType(commonInvoiceItemFieldDefinitions)
 
-                                                                        .field(toInputField(commonInvoiceFieldDefinitions["number"]))
-                                                                        .field(toInputField(commonInvoiceFieldDefinitions["creationDate"]))
-                                                                        .field(toInputField(commonInvoiceFieldDefinitions["paymentDate"]))
-                                                                        .field(toInputField(commonInvoiceFieldDefinitions["paid"]))
-                                                                        .field(toInputField(commonInvoiceFieldDefinitions["totalAmount"]))
-
-                                                                        .field(GraphQLInputObjectField.newInputObjectField()
-                                                                                                      .name("id")
-                                                                                                      .type(Scalars.GraphQLID) // Not Null is not Cool
-                                                                                                      .build())
-
-                                                                        .field(GraphQLInputObjectField.newInputObjectField()
-                                                                                                      .name("user")
-                                                                                                      .type(GraphQLInputObjectType.newInputObject()
-                                                                                                                                  .name("InputInvoiceUserType")
-                                                                                                                                  .field(GraphQLInputObjectField.newInputObjectField()
-                                                                                                                                                                .name("id")
-                                                                                                                                                                .type(new GraphQLNonNull(Scalars.GraphQLID))
-                                                                                                                                                                .build())
-                                                                                                                                  .build())
-                                                                                                      .build())
-
-                                                                        .field(GraphQLInputObjectField.newInputObjectField()
-                                                                                                      .name("customer")
-                                                                                                      .type(GraphQLInputObjectType.newInputObject()
-                                                                                                                                  .name("InputInvoiceUserType")
-                                                                                                                                  .field(GraphQLInputObjectField.newInputObjectField()
-                                                                                                                                                                .name("id")
-                                                                                                                                                                .type(new GraphQLNonNull(Scalars.GraphQLID))
-                                                                                                                                                                .build())
-                                                                                                                                  .build())
-                                                                                                      .build())
-
-                                                                        .build()
 
         GraphQLObjectType queryType = GraphQLObjectType.newObject()
                                                        .name("invoicingRootQuery")
@@ -262,10 +236,32 @@ class InvoiceGraphQLSchemaFactory {
                                        .type(OutputInvoiceType).build()],
                 updateInvoiceMutationDataFetcher)
 
+        GraphQLFieldDefinition createInvoiceItemInputMutationDefinition = relay.mutationWithClientMutationId(
+                "InvoiceItem", "createInvoiceItem",
+                [GraphQLInputObjectField.newInputObjectField()
+                                        .name("invoiceItem")
+                                        .type(InputInvoiceItemType).build()],
+                [GraphQLFieldDefinition.newFieldDefinition()
+                                       .name("invoiceItem")
+                                       .type(OutputInvoiceItemType).build()],
+                createInvoiceItemMutationDataFetcher)
+
+        GraphQLFieldDefinition updateInvoiceItemInputMutationDefinition = relay.mutationWithClientMutationId(
+                "InvoiceItem", "updateInvoiceItem",
+                [GraphQLInputObjectField.newInputObjectField()
+                                        .name("invoiceItem")
+                                        .type(InputInvoiceItemType).build()],
+                [GraphQLFieldDefinition.newFieldDefinition()
+                                       .name("invoiceItem")
+                                       .type(OutputInvoiceItemType).build()],
+                updateInvoiceItemMutationDataFetcher)
+
         GraphQLObjectType mutationType = GraphQLObjectType.newObject()
                                                           .name("invoicingMutation")
                                                           .field(updateInvoiceInputMutationDefinition)
                                                           .field(createInvoiceInputMutationDefinition)
+                                                          .field(createInvoiceItemInputMutationDefinition)
+                                                          .field(updateInvoiceItemInputMutationDefinition)
                                                           .build();
         return GraphQLSchema.newSchema()
                             .query(queryType)
@@ -277,4 +273,73 @@ class InvoiceGraphQLSchemaFactory {
         return new GraphQLInputObjectField(sourceField.name, sourceField.description, (GraphQLInputType) sourceField.type, null)
     }
 
+    private static GraphQLInputObjectType InputInvoiceType(Map<String, GraphQLFieldDefinition> fieldDefinitions) {
+        // Not recursion yet on self-referencing objects for inputs (see https://github.com/graphql-java/graphql-java/issues/172)
+        // so GraphQLTypeReference can not be used as input objects yet
+        return GraphQLInputObjectType.newInputObject()
+                                     .name("InputInvoice")
+
+                                     .field(toInputField(fieldDefinitions["number"]))
+                                     .field(toInputField(fieldDefinitions["creationDate"]))
+                                     .field(toInputField(fieldDefinitions["paymentDate"]))
+                                     .field(toInputField(fieldDefinitions["paid"]))
+                                     .field(toInputField(fieldDefinitions["totalAmount"]))
+
+                                     .field(GraphQLInputObjectField.newInputObjectField()
+                                                                   .name("id")
+                                                                   .type(Scalars.GraphQLID) // Not Null is not Cool
+                                                                   .build())
+
+                                     .field(GraphQLInputObjectField.newInputObjectField()
+                                                                   .name("user")
+                                                                   .type(GraphQLInputObjectType.newInputObject()
+                                                                                               .name("InputInvoiceUserType")
+                                                                                               .field(GraphQLInputObjectField.newInputObjectField()
+                                                                                                                             .name("id")
+                                                                                                                             .type(new GraphQLNonNull(Scalars.GraphQLID))
+                                                                                                                             .build())
+                                                                                               .build())
+                                                                   .build())
+
+                                     .field(GraphQLInputObjectField.newInputObjectField()
+                                                                   .name("customer")
+                                                                   .type(GraphQLInputObjectType.newInputObject()
+                                                                                               .name("InputInvoiceUserType")
+                                                                                               .field(GraphQLInputObjectField.newInputObjectField()
+                                                                                                                             .name("id")
+                                                                                                                             .type(new GraphQLNonNull(Scalars.GraphQLID))
+                                                                                                                             .build())
+                                                                                               .build())
+                                                                   .build())
+
+                                     .build()
+
+    }
+
+    private static GraphQLInputObjectType InputItemInvoiceType(Map<String, GraphQLFieldDefinition> fieldDefinitions) {
+        return GraphQLInputObjectType.newInputObject()
+                                     .name("InputInvoiceItem")
+
+                                     .field(toInputField(fieldDefinitions["name"]))
+                                     .field(toInputField(fieldDefinitions["price"]))
+
+                                     .field(GraphQLInputObjectField.newInputObjectField()
+                                                                   .name("id")
+                                                                   .type(Scalars.GraphQLID) // Not Null is not Cool
+                                                                   .build())
+
+                                     .field(GraphQLInputObjectField.newInputObjectField()
+                                                                   .name("invoice")
+                                                                   .type(GraphQLInputObjectType.newInputObject()
+                                                                                               .name("InputInvoiceItemInvoiceType")
+                                                                                               .field(GraphQLInputObjectField.newInputObjectField()
+                                                                                                                             .name("id")
+                                                                                                                             .type(new GraphQLNonNull(Scalars.GraphQLID))
+                                                                                                                             .build())
+                                                                                               .build())
+                                                                   .build())
+
+                                     .build()
+
+    }
 }
