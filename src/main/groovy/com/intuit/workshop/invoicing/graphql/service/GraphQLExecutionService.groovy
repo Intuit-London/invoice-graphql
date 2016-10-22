@@ -1,4 +1,4 @@
-package com.intuit.workshop.invoicing.graphql
+package com.intuit.workshop.invoicing.graphql.service
 
 import com.intuit.workshop.invoicing.graphql.schema.GraphQLSchemaHolder
 import graphql.ExceptionWhileDataFetching
