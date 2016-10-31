@@ -27,7 +27,7 @@ $ ./gradlew build && java -jar build/libs/invoice-grapqhl-1.0-SNAPSHOT.jar
 Run the following cURL:
 
 ```sh
-$ curl -X POST -H "Content-Type:application/json"  -d '{"query":"{ user { id \n invoices { id } } }" }' http://localhost:8080/graphql
+$ curl -X POST -H "Content-Type:application/json"  -d '{"query":"{ users { id \n invoices { id } } }" }' http://localhost:8080/graphql
 ```
 
 It should return something similar to:
