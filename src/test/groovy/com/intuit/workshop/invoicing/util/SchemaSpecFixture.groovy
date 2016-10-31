@@ -45,6 +45,17 @@ class SchemaSpecFixture {
 }
 """
 
+    static final String USER_QUERY_FILTERED =
+            """
+{
+    users(id: "${GlobalIdHelper.id("/User", "user-1")}") {
+        id
+        firstName
+        lastName
+    }
+}
+"""
+
     static final String NODE_QUERY =
             """
 {

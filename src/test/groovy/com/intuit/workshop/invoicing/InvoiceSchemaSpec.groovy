@@ -110,6 +110,22 @@ class InvoiceSchemaSpec extends Specification {
         ]
     }
 
+    void "Filter through the 'user' root query"() {
+        expect:
+        Map<String, Object> result = successExecution(SchemaSpecFixture.USER_QUERY_FILTERED).getData();
+        result == [
+                users: [
+                        [
+
+                                id       : id("/User", "user-1"),
+                                firstName: "First",
+                                lastName : "User",
+                        ]
+
+                ]
+        ]
+    }
+
     void "Query through the 'node' root field"() {
         expect:
         Map<String, Object> result = successExecution(SchemaSpecFixture.NODE_QUERY).getData();
@@ -257,6 +273,10 @@ class InvoiceSchemaSpec extends Specification {
 
         @Override
         Object get(DataFetchingEnvironment environment) {
+            String globalId = (String) environment.arguments.id
+            if (globalId) {
+                return [SchemaSpecFixture.build().users().find { it.id == globalId }]
+            }
             return SchemaSpecFixture.build().users()
         }
     }

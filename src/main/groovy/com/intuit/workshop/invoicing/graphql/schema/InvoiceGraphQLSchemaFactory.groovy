@@ -4,6 +4,7 @@ import com.intuit.workshop.invoicing.domain.entity.id.EntityType
 import graphql.Scalars
 import graphql.relay.Relay
 import graphql.schema.DataFetcher
+import graphql.schema.GraphQLArgument
 import graphql.schema.GraphQLFieldDefinition
 import graphql.schema.GraphQLInputObjectField
 import graphql.schema.GraphQLInputObjectType
@@ -213,6 +214,10 @@ class InvoiceGraphQLSchemaFactory {
                                                                                     .type(new GraphQLList(OutputUserType))
                                                                                     .name("users")
                                                                                     .dataFetcher(userQueryDataFetcher)
+                                                                                    .argument(GraphQLArgument.newArgument()
+                                                                                                             .name("id")
+                                                                                                             .type(Scalars.GraphQLString)
+                                                                                                             .build())
                                                                                     .build())
                                                        .build();
 
