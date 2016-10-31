@@ -1,29 +1,25 @@
 package com.intuit.workshop.invoicing
 
-import com.intuit.workshop.invoicing.domain.entity.id.EntityType
+import com.intuit.workshop.Application
 import com.intuit.workshop.invoicing.domain.entity.id.GlobalIdHelper
 import com.intuit.workshop.invoicing.domain.repository.util.StaticModelBuilder
-import com.intuit.workshop.invoicing.graphql.schema.InvoiceGraphQLSchemaFactory
-import com.intuit.workshop.invoicing.graphql.schema.RelayMutation
+import com.intuit.workshop.invoicing.graphql.service.GraphQLExecutionService
 import com.intuit.workshop.invoicing.util.SchemaSpecFixture
-import graphql.ExecutionResult
-import graphql.GraphQL
-import graphql.schema.DataFetcher
-import graphql.schema.DataFetchingEnvironment
-import graphql.schema.GraphQLSchema
+import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.boot.test.context.SpringBootTest
+import org.springframework.test.context.ContextConfiguration
 import spock.lang.Specification
 
-class InvoiceSchemaSpec extends Specification {
+@SpringBootTest
+@ContextConfiguration(classes = Application)
+class InvoicingIntegrationSpec extends Specification {
 
-    GraphQLSchema schema
-
-    void setup() {
-        schema = createSchema()
-    }
+    @Autowired
+    GraphQLExecutionService executionService
 
     void "Query through the 'user' root field"() {
         expect:
-        Map<String, Object> result = successExecution(SchemaSpecFixture.USER_QUERY).getData();
+        Map<String, Object> result = successExecution(SchemaSpecFixture.USER_QUERY);
         result == [
                 users: [
                         [
@@ -112,7 +108,7 @@ class InvoiceSchemaSpec extends Specification {
 
     void "Filter through the 'user' root query"() {
         expect:
-        Map<String, Object> result = successExecution(SchemaSpecFixture.USER_QUERY_FILTERED).getData();
+        Map<String, Object> result = successExecution(SchemaSpecFixture.USER_QUERY_FILTERED)
         result == [
                 users: [
                         [
@@ -128,7 +124,7 @@ class InvoiceSchemaSpec extends Specification {
 
     void "Query through the 'node' root field"() {
         expect:
-        Map<String, Object> result = successExecution(SchemaSpecFixture.NODE_QUERY).getData();
+        Map<String, Object> result = successExecution(SchemaSpecFixture.NODE_QUERY)
         result == [
                 node: [
                         id: id("/User", "user-1")
@@ -138,13 +134,18 @@ class InvoiceSchemaSpec extends Specification {
 
     void "Relay-Compliant create mutation of a full invoice as an input"() {
         expect:
-        Map<String, Object> result = successExecution(SchemaSpecFixture.RELAY_CREATE_INVOICE_MUTATION).getData();
+        Map<String, Object> result = successExecution(SchemaSpecFixture.RELAY_CREATE_INVOICE_MUTATION)
         result == [
                 createInvoice: [
                         clientMutationId: "client-mutation-1",
                         invoice         :
                                 [
-                                        id: id("/Invoice", "invoice-1")
+                                        user       :
+                                                [
+                                                        id: id("/User", "user-1")
+                                                ],
+                                        number     : 1234,
+                                        totalAmount: 100
                                 ]
 
                 ]
@@ -153,74 +154,26 @@ class InvoiceSchemaSpec extends Specification {
 
     void "Relay-Compliant update mutation of a full invoice as an input"() {
         expect:
-        Map<String, Object> result = successExecution(SchemaSpecFixture.RELAY_INPUT_UPDATE_MUTATION).getData();
+        Map<String, Object> result = successExecution(SchemaSpecFixture.RELAY_INPUT_UPDATE_MUTATION)
         result == [
                 updateInvoice: [
                         clientMutationId: "client-mutation-1",
                         invoice         :
                                 [
-                                        id: id("/Invoice", "invoice-1")
-                                ]
-
-                ]
-        ]
-    }
-
-    void "Relay-Compliant mutation of a full invoice as an output"() {
-        expect:
-        Map<String, Object> result = successExecution(SchemaSpecFixture.RELAY_OUTPUT_UPDATE_MUTATION).getData();
-        result == [
-                updateInvoice: [
-                        clientMutationId: "client-mutation-1",
-                        invoice         :
-                                [
-                                        id          : id("/Invoice", "invoice-1"),
-                                        user        : [
-                                                id: id("/User", "user-1")
-                                        ],
-                                        number      : 1,
-                                        customer    : [
-                                                id          : id("/Customer", "customer-1"),
-                                                businessName: "First Customer Ever",
-                                                invoices    : [
-                                                        [
-                                                                id: id("/Invoice", "invoice-1")
-                                                        ]
-                                                ]
-
-                                        ],
-                                        creationDate: StaticModelBuilder.DATE.toString(),
-                                        paymentDate : StaticModelBuilder.DATE.toString(),
-                                        paid        : true,
-                                        items       : [
+                                        user       :
                                                 [
-                                                        id     : id("/InvoiceItem", "invoice-1-item-1"),
-                                                        invoice: [
-                                                                id: id("/Invoice", "invoice-1")
-                                                        ],
-                                                        name   : "Bags",
-                                                        price  : 100
+                                                        id: id("/User", "user-1")
                                                 ],
-                                                [
-                                                        id     : id("/InvoiceItem", "invoice-1-item-2"),
-                                                        invoice: [
-                                                                id: id("/Invoice", "invoice-1")
-                                                        ],
-                                                        name   : "Gloves",
-                                                        price  : 200
-                                                ]
-                                        ],
-                                        totalAmount : 300
-
-                                ],
-
+                                        number     : 1234,
+                                        totalAmount: 100
+                                ]
                 ]
         ]
     }
 
     void "Relay-Compliant create mutation of a full invoice item as an input"() {
         expect:
-        Map<String, Object> result = successExecution(SchemaSpecFixture.RELAY_CREATE_INVOICE_ITEM_MUTATION).getData();
+        Map<String, Object> result = successExecution(SchemaSpecFixture.RELAY_CREATE_INVOICE_ITEM_MUTATION)
         result == [
                 createInvoiceItem: [
                         clientMutationId: "client-mutation-1",
@@ -235,80 +188,28 @@ class InvoiceSchemaSpec extends Specification {
 
     void "Relay-Compliant update mutation of a full invoice item as an input"() {
         expect:
-        Map<String, Object> result = successExecution(SchemaSpecFixture.RELAY_UPDATE_INVOICE_ITEM_MUTATION).getData();
+        Map<String, Object> result = successExecution(SchemaSpecFixture.RELAY_UPDATE_INVOICE_ITEM_MUTATION)
         result == [
                 updateInvoiceItem: [
                         clientMutationId: "client-mutation-1",
                         invoiceItem     :
                                 [
-                                        id: id("/InvoiceItem", "invoice-1-item-1")
+                                        id: id("/InvoiceItem", "invoice-1-item-1"),
+                                        name: "Food",
+                                        price: 1000
                                 ]
 
                 ]
         ]
     }
 
-    private ExecutionResult successExecution(String query) {
-        ExecutionResult executionResult = new GraphQL(schema).execute(query)
-        assert executionResult.getErrors() == [], "No errors are expected, but found: ${executionResult.getErrors()}"
-        return executionResult
-    }
-
-    private createSchema() {
-        InvoiceGraphQLSchemaFactory graphQLSchemaFactory = new InvoiceGraphQLSchemaFactory()
-        graphQLSchemaFactory.userQueryDataFetcher = new MockRootQueryDataFetcher()
-        graphQLSchemaFactory.nodeQueryDataFetcher = new MockNodeQueryDataFetcher()
-        graphQLSchemaFactory.createInvoiceMutationDataFetcher = new MockMutationDataFetcher(EntityType.INVOICE)
-        graphQLSchemaFactory.updateInvoiceMutationDataFetcher = new MockMutationDataFetcher(EntityType.INVOICE)
-        graphQLSchemaFactory.createInvoiceItemMutationDataFetcher = new MockMutationDataFetcher(EntityType.INVOICE_ITEM)
-        graphQLSchemaFactory.updateInvoiceItemMutationDataFetcher = new MockMutationDataFetcher(EntityType.INVOICE_ITEM)
-        return graphQLSchemaFactory.build()
+    private Map<String, Object> successExecution(String query) {
+        Map<String, Object> result = executionService.execute(query)
+        assert !result.errors, "No errors are expected, but found: ${result.errors}"
+        return (Map) result.data
     }
 
     private String id(String type, String id) {
         return GlobalIdHelper.id(type, id)
     }
-
-    class MockRootQueryDataFetcher implements DataFetcher {
-
-        @Override
-        Object get(DataFetchingEnvironment environment) {
-            String globalId = (String) environment.arguments.id
-            if (globalId) {
-                return [SchemaSpecFixture.build().users().find { it.id == globalId }]
-            }
-            return SchemaSpecFixture.build().users()
-        }
-    }
-
-    class MockNodeQueryDataFetcher implements DataFetcher {
-
-        @Override
-        Object get(DataFetchingEnvironment environment) {
-            return SchemaSpecFixture.build().users().first()
-        }
-
-    }
-
-    class MockMutationDataFetcher implements DataFetcher {
-
-        EntityType type
-
-        MockMutationDataFetcher(EntityType type) {
-            this.type = type
-        }
-
-        @Override
-        Object get(DataFetchingEnvironment environment) {
-            if (type == EntityType.INVOICE) {
-                return new RelayMutation(clientMutationId: "client-mutation-1", invoice: SchemaSpecFixture.build().firstInvoice())
-            }
-            if (type == EntityType.INVOICE_ITEM) {
-                return new RelayMutation(clientMutationId: "client-mutation-1", invoiceItem: SchemaSpecFixture.build().firstInvoiceItem())
-            }
-        }
-    }
-
 }
-
-

@@ -19,7 +19,7 @@ class InvoiceService {
     }
 
     Invoice updateInvoice(Map properties) {
-        Invoice persistedInvoice = (Invoice)repository.getInvoiceById(properties.id).clone()
+        Invoice persistedInvoice = (Invoice)repository.getInvoiceById(properties.id)?.clone()
         Assert.notNull(persistedInvoice, "Can not find the invoice to update (ID: ${properties.id})")
         merge(properties, persistedInvoice)
         Invoice invoice = repository.saveInvoice(persistedInvoice)
@@ -32,7 +32,7 @@ class InvoiceService {
     }
 
     InvoiceItem updateInvoiceItem(Map properties) {
-        InvoiceItem persistedInvoiceItem = (InvoiceItem)repository.getInvoiceItemById(properties.id).clone()
+        InvoiceItem persistedInvoiceItem = (InvoiceItem)repository.getInvoiceItemById(properties.id)?.clone()
         Assert.notNull(persistedInvoiceItem, "Can not find the invoice item to update (ID: ${properties.id})")
         merge(properties, persistedInvoiceItem)
         InvoiceItem invoiceItem = repository.saveInvoiceItem(persistedInvoiceItem)

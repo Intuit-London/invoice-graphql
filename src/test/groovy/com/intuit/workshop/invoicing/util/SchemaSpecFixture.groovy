@@ -1,10 +1,6 @@
 package com.intuit.workshop.invoicing.util
 
-import com.intuit.workshop.invoicing.domain.entity.InvoiceItem
 import com.intuit.workshop.invoicing.domain.entity.id.GlobalIdHelper
-import com.intuit.workshop.invoicing.domain.repository.util.StaticModelBuilder
-import com.intuit.workshop.invoicing.domain.entity.Invoice
-import com.intuit.workshop.invoicing.domain.entity.User
 
 class SchemaSpecFixture {
 
@@ -59,7 +55,7 @@ class SchemaSpecFixture {
     static final String NODE_QUERY =
             """
 {
-    node(id: "ID") {
+    node(id: "${GlobalIdHelper.id("/User", "user-1")}") {
         id
     }
 }
@@ -86,7 +82,11 @@ mutation InvoiceMutation {
     }) {
         clientMutationId
         invoice {
-            id
+            user {
+                id
+            }
+            number
+            totalAmount
         }
     }
 }
@@ -98,6 +98,7 @@ mutation InvoiceMutation {
     updateInvoice(input: {
         clientMutationId: "client-mutation-1",
         invoice: {
+            id: "${GlobalIdHelper.id("/Invoice", "invoice-1")}",
             user: {
                 id: "${GlobalIdHelper.id("/User", "user-1")}"
             },
@@ -113,7 +114,11 @@ mutation InvoiceMutation {
     }) {
         clientMutationId
         invoice {
-            id
+            user {
+                id
+            }
+            number
+            totalAmount
         }
     }
 }
@@ -125,6 +130,7 @@ mutation InvoiceMutation {
     createInvoiceItem(input: {
         clientMutationId: "client-mutation-1",
         invoiceItem: {
+            id: "${GlobalIdHelper.id("/InvoiceItem", "invoice-1-item-1")}"
             invoice: {
                 id: "${GlobalIdHelper.id("/Invoice", "invoice-1")}"
             },
@@ -146,7 +152,7 @@ mutation InvoiceMutation {
     updateInvoiceItem(input: {
         clientMutationId: "client-mutation-1",
         invoiceItem: {
-            id: "${GlobalIdHelper.id("/InvoiceItem", "invoice-1-item1")}"
+            id: "${GlobalIdHelper.id("/InvoiceItem", "invoice-1-item-1")}"
             invoice: {
                 id: "${GlobalIdHelper.id("/Invoice", "invoice-1")}"
             },
@@ -157,65 +163,12 @@ mutation InvoiceMutation {
         clientMutationId
         invoiceItem {
             id
+            name
+            price
         }
     }
 }
 """
-
-    static final String RELAY_OUTPUT_UPDATE_MUTATION =
-            """
-mutation InvoiceMutation {
-    updateInvoice(input: {
-        clientMutationId: "client-mutation-1",
-    }) {
-        clientMutationId
-        invoice {
-            id
-            user {
-                id
-            }
-            number
-            customer {
-                id
-                businessName
-                invoices {
-                    id
-                }
-            }
-            creationDate
-            paymentDate
-            paid
-            items {
-                id
-                invoice {
-                    id
-                }
-                name
-                price
-            }
-            totalAmount
-        }
-    }
-}
-"""
-
-    private List<User> users
-
-    List<User> users() {
-        return users
-    }
-
-    Invoice firstInvoice() {
-        return (Invoice) users.collect { it.invoices }.flatten().find { it.id == GlobalIdHelper.id("/Invoice", "invoice-1") }
-    }
-
-    InvoiceItem firstInvoiceItem() {
-        return firstInvoice().items.find { it.id == GlobalIdHelper.id("/InvoiceItem", "invoice-1-item-1")}
-    }
-
-    static SchemaSpecFixture build() {
-        return new SchemaSpecFixture(users: StaticModelBuilder.buildStaticModel())
-    }
 
 }
 
