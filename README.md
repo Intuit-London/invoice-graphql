@@ -33,7 +33,7 @@ $ curl -X POST -H "Content-Type:application/json"  -d '{"query":"{ users { id \n
 It should return something similar to:
 
 ```sh
-{"data":{"user":{"id":"user-1","invoices":[{"id":"invoice-1"},{"id":"invoice-2"}]}}}`
+{"data":{"users":[{"id":"L1VzZXI6dXNlci0x","invoices":[{"id":"L0ludm9pY2U6aW52b2ljZS0x"},{"id":"L0ludm9pY2U6aW52b2ljZS0y"}]}]}}
 ```
 
 A query with most of the schema can be seen in the [SchemaSpecFixture](src/test/groovy/com/intuit/workshop/invoicing/util/SchemaSpecFixture.groovy) class.
