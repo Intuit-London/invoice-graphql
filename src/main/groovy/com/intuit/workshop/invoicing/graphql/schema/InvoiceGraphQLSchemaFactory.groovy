@@ -216,7 +216,7 @@ class InvoiceGraphQLSchemaFactory {
                                                                                     .dataFetcher(userQueryDataFetcher)
                                                                                     .argument(GraphQLArgument.newArgument()
                                                                                                              .name("id")
-                                                                                                             .type(Scalars.GraphQLString)
+                                                                                                             .type(new GraphQLList(Scalars.GraphQLString))
                                                                                                              .build())
                                                                                     .build())
                                                        .build();

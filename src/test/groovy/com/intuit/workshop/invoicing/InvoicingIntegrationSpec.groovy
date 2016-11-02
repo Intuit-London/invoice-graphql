@@ -106,9 +106,25 @@ class InvoicingIntegrationSpec extends Specification {
         ]
     }
 
-    void "Filter through the 'user' root query"() {
+    void "Filter through the 'user' root query using a single id"() {
         expect:
-        Map<String, Object> result = successExecution(SchemaSpecFixture.USER_QUERY_FILTERED)
+        Map<String, Object> result = successExecution(SchemaSpecFixture.USER_QUERY_FILTERED_SINGLE_ID)
+        result == [
+                users: [
+                        [
+
+                                id       : id("/User", "user-1"),
+                                firstName: "First",
+                                lastName : "User",
+                        ]
+
+                ]
+        ]
+    }
+
+    void "Filter through the 'user' root query using a list of ids"() {
+        expect:
+        Map<String, Object> result = successExecution(SchemaSpecFixture.USER_QUERY_FILTERED_LIST_IDS)
         result == [
                 users: [
                         [

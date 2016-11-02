@@ -14,9 +14,9 @@ class UserQueryDataFetcher implements DataFetcher {
 
     @Override
     Object get(DataFetchingEnvironment environment) {
-        String globalId = (String)environment.arguments.id
-        if (globalId) {
-            return [repository.getUserById(globalId)]
+        List<String> globalIds = (List<String>)environment.arguments.id
+        if (globalIds) {
+            return [repository.getUserById(globalIds.first())]
         }
         return repository.findUsers()
     }
