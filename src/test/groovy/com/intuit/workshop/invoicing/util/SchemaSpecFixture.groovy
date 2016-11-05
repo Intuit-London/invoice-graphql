@@ -41,10 +41,21 @@ class SchemaSpecFixture {
 }
 """
 
-    static final String USER_QUERY_FILTERED =
+    static final String USER_QUERY_FILTERED_SINGLE_ID =
             """
 {
     users(id: "${GlobalIdHelper.id("/User", "user-1")}") {
+        id
+        firstName
+        lastName
+    }
+}
+"""
+
+    static final String USER_QUERY_FILTERED_LIST_IDS =
+            """
+{
+    users(id: [ "${GlobalIdHelper.id("/User", "user-1")}", "${GlobalIdHelper.id("/User", "user-2")}" ]) {
         id
         firstName
         lastName
