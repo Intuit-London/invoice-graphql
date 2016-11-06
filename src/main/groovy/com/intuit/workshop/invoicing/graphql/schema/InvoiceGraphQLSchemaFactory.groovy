@@ -203,86 +203,80 @@ class InvoiceGraphQLSchemaFactory {
                                           .withInterface(NodeInterfaceType)
                                           .build()
 
-        GraphQLInputObjectType InputInvoiceType = InputInvoiceType(commonInvoiceFieldDefinitions)
-        GraphQLInputObjectType InputInvoiceItemType = InputItemInvoiceType(commonInvoiceItemFieldDefinitions)
-
-
-        GraphQLObjectType queryType = GraphQLObjectType.newObject()
-                                                       .name("invoicingRootQuery")
-                                                       .field(relay.nodeField(NodeInterfaceType, nodeQueryDataFetcher))
-                                                       .field(GraphQLFieldDefinition.newFieldDefinition()
-                                                                                    .type(new GraphQLList(OutputUserType))
-                                                                                    .name("users")
-                                                                                    .dataFetcher(userQueryDataFetcher)
-                                                                                    .argument(GraphQLArgument.newArgument()
-                                                                                                             .name("id")
-                                                                                                             .type(new GraphQLList(Scalars.GraphQLString))
-                                                                                                             .build())
-                                                                                    .build())
-                                                       .build();
+        GraphQLObjectType RootQueryType = GraphQLObjectType.newObject()
+                                                           .name("invoicingRootQuery")
+                                                           .field(relay.nodeField(NodeInterfaceType, nodeQueryDataFetcher))
+                                                           .field(GraphQLFieldDefinition.newFieldDefinition()
+                                                                                        .type(new GraphQLList(OutputUserType))
+                                                                                        .name("users")
+                                                                                        .dataFetcher(userQueryDataFetcher)
+                                                                                        .argument(GraphQLArgument.newArgument()
+                                                                                                                 .name("id")
+                                                                                                                 .type(new GraphQLList(Scalars.GraphQLString))
+                                                                                                                 .build())
+                                                                                        .build())
+                                                           .build();
 
         GraphQLFieldDefinition createInvoiceInputMutationDefinition = relay.mutationWithClientMutationId(
-                "Invoice", "createInvoice",
+                "CreateInvoice", "createInvoice",
                 [GraphQLInputObjectField.newInputObjectField()
                                         .name("invoice")
-                                        .type(InputInvoiceType).build()],
+                                        .type(InputInvoiceType("CreateInvoice", commonInvoiceFieldDefinitions)).build()],
                 [GraphQLFieldDefinition.newFieldDefinition()
                                        .name("invoice")
                                        .type(OutputInvoiceType).build()],
                 createInvoiceMutationDataFetcher)
 
         GraphQLFieldDefinition updateInvoiceInputMutationDefinition = relay.mutationWithClientMutationId(
-                "Invoice", "updateInvoice",
+                "UpdateInvoice", "updateInvoice",
                 [GraphQLInputObjectField.newInputObjectField()
                                         .name("invoice")
-                                        .type(InputInvoiceType).build()],
+                                        .type(InputInvoiceType("UpdateInvoice", commonInvoiceFieldDefinitions)).build()],
                 [GraphQLFieldDefinition.newFieldDefinition()
                                        .name("invoice")
                                        .type(OutputInvoiceType).build()],
                 updateInvoiceMutationDataFetcher)
 
         GraphQLFieldDefinition createInvoiceItemInputMutationDefinition = relay.mutationWithClientMutationId(
-                "InvoiceItem", "createInvoiceItem",
+                "CreateInvoiceItem", "createInvoiceItem",
                 [GraphQLInputObjectField.newInputObjectField()
                                         .name("invoiceItem")
-                                        .type(InputInvoiceItemType).build()],
+                                        .type(InputItemInvoiceType("CreateInvoiceItem", commonInvoiceItemFieldDefinitions)).build()],
                 [GraphQLFieldDefinition.newFieldDefinition()
                                        .name("invoiceItem")
                                        .type(OutputInvoiceItemType).build()],
                 createInvoiceItemMutationDataFetcher)
 
         GraphQLFieldDefinition updateInvoiceItemInputMutationDefinition = relay.mutationWithClientMutationId(
-                "InvoiceItem", "updateInvoiceItem",
+                "UpdateInvoiceItem", "updateInvoiceItem",
                 [GraphQLInputObjectField.newInputObjectField()
                                         .name("invoiceItem")
-                                        .type(InputInvoiceItemType).build()],
+                                        .type(InputItemInvoiceType("UpdateInvoiceItem", commonInvoiceItemFieldDefinitions)).build()],
                 [GraphQLFieldDefinition.newFieldDefinition()
                                        .name("invoiceItem")
                                        .type(OutputInvoiceItemType).build()],
                 updateInvoiceItemMutationDataFetcher)
 
-        GraphQLObjectType mutationType = GraphQLObjectType.newObject()
-                                                          .name("invoicingMutation")
-                                                          .field(updateInvoiceInputMutationDefinition)
-                                                          .field(createInvoiceInputMutationDefinition)
-                                                          .field(createInvoiceItemInputMutationDefinition)
-                                                          .field(updateInvoiceItemInputMutationDefinition)
-                                                          .build();
+        GraphQLObjectType RootMutationType = GraphQLObjectType.newObject()
+                                                              .name("invoicingRootMutation")
+                                                              .field(updateInvoiceInputMutationDefinition)
+                                                              .field(createInvoiceInputMutationDefinition)
+                                                              .field(createInvoiceItemInputMutationDefinition)
+                                                              .field(updateInvoiceItemInputMutationDefinition)
+                                                              .build();
+
         return GraphQLSchema.newSchema()
-                            .query(queryType)
-                            .mutation(mutationType)
+                            .query(RootQueryType)
+                            .mutation(RootMutationType)
                             .build();
     }
 
-    private static GraphQLInputObjectField toInputField(GraphQLFieldDefinition sourceField) {
-        return new GraphQLInputObjectField(sourceField.name, sourceField.description, (GraphQLInputType) sourceField.type, null)
-    }
-
-    private static GraphQLInputObjectType InputInvoiceType(Map<String, GraphQLFieldDefinition> fieldDefinitions) {
+    private static GraphQLInputObjectType InputInvoiceType(String typePrefix,
+                                                           Map<String, GraphQLFieldDefinition> fieldDefinitions) {
         // Not recursion yet on self-referencing objects for inputs (see https://github.com/graphql-java/graphql-java/issues/172)
         // so GraphQLTypeReference can not be used as input objects yet
         return GraphQLInputObjectType.newInputObject()
-                                     .name("InputInvoice")
+                                     .name(typePrefix + "InputInvoice")
 
                                      .field(toInputField(fieldDefinitions["number"]))
                                      .field(toInputField(fieldDefinitions["creationDate"]))
@@ -292,7 +286,7 @@ class InvoiceGraphQLSchemaFactory {
 
                                      .field(GraphQLInputObjectField.newInputObjectField()
                                                                    .name("id")
-                                                                   .type(Scalars.GraphQLID) // Not Null is not Cool
+                                                                   .type(Scalars.GraphQLID) // Using GraphQLNotNull seems to not be cool
                                                                    .build())
 
                                      .field(GraphQLInputObjectField.newInputObjectField()
@@ -325,16 +319,17 @@ class InvoiceGraphQLSchemaFactory {
 
     }
 
-    private static GraphQLInputObjectType InputItemInvoiceType(Map<String, GraphQLFieldDefinition> fieldDefinitions) {
+    private static GraphQLInputObjectType InputItemInvoiceType(String typePrefix,
+                                                               Map<String, GraphQLFieldDefinition> fieldDefinitions) {
         return GraphQLInputObjectType.newInputObject()
-                                     .name("InputInvoiceItem")
+                                     .name(typePrefix + "_InputInvoiceItem")
 
                                      .field(toInputField(fieldDefinitions["name"]))
                                      .field(toInputField(fieldDefinitions["price"]))
 
                                      .field(GraphQLInputObjectField.newInputObjectField()
                                                                    .name("id")
-                                                                   .type(Scalars.GraphQLID) // Not Null is not Cool
+                                                                   .type(Scalars.GraphQLID) // Using GraphQLNotNull seems to not be cool
                                                                    .build())
 
                                      .field(GraphQLInputObjectField.newInputObjectField()
@@ -350,5 +345,9 @@ class InvoiceGraphQLSchemaFactory {
 
                                      .build()
 
+    }
+
+    private static GraphQLInputObjectField toInputField(GraphQLFieldDefinition sourceField) {
+        return new GraphQLInputObjectField(sourceField.name, sourceField.description, (GraphQLInputType) sourceField.type, null)
     }
 }

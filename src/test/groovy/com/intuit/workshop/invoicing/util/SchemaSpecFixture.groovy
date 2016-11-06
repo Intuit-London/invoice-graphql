@@ -183,4 +183,42 @@ mutation InvoiceMutation {
 }
 """
 
+    static final String RELAY_CREATE_INVOICE_MUTATION_WITH_VARIABLE =
+            """
+mutation CreateInvoice(\$input_0:CreateInvoiceInput!) {
+    createInvoice(input:\$input_0) {
+        clientMutationId
+        invoice {
+            user {
+                id
+            }
+            number
+            totalAmount
+        }
+    }
+}
+"""
+
+    static final String RELAY_CREATE_INVOICE_VARIABLE =
+            """
+{
+    "input_0": {
+        "invoice": {
+            "number":"35",
+            "creationDate": "25-06-2016",
+            "paid": false,
+            "customer": {
+                "id": "${GlobalIdHelper.id("/Customer", "customer-1")}",
+                "businessName":"asfa"
+            },
+            "user" : {
+                "id": "${GlobalIdHelper.id("/User", "user-1")}"
+            },
+            "totalAmount": 234.34
+        },
+        "clientMutationId": "client-mutation-1"
+    }
+}
+"""
+
 }

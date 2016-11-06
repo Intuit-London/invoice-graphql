@@ -5,6 +5,7 @@ import com.intuit.workshop.invoicing.domain.entity.id.GlobalIdHelper
 import com.intuit.workshop.invoicing.domain.repository.util.StaticModelBuilder
 import com.intuit.workshop.invoicing.graphql.service.GraphQLExecutionService
 import com.intuit.workshop.invoicing.util.SchemaSpecFixture
+import groovy.json.JsonSlurper
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.test.context.ContextConfiguration
@@ -219,13 +220,42 @@ class InvoicingIntegrationSpec extends Specification {
         ]
     }
 
-    private Map<String, Object> successExecution(String query) {
-        Map<String, Object> result = executionService.execute(query)
+    void "Relay-Compliant create mutation using an input variable"() {
+        expect:
+        Map<String, Object> result = successExecution(
+                SchemaSpecFixture.RELAY_CREATE_INVOICE_MUTATION_WITH_VARIABLE,
+                SchemaSpecFixture.RELAY_CREATE_INVOICE_VARIABLE)
+        result == [
+                createInvoice: [
+                        clientMutationId: "client-mutation-1",
+                        invoice         :
+                                [
+                                        user       :
+                                                [
+                                                        id: id("/User", "user-1")
+                                                ],
+                                        number     : 35,
+                                        totalAmount: 234.34
+                                ]
+
+                ]
+        ]
+    }
+
+    private Map<String, Object> successExecution(String query, String variables = "") {
+        Map<String, Object> result = executionService.execute(query, parseVariables(variables))
         assert !result.errors, "No errors are expected, but found: ${result.errors}"
         return (Map) result.data
     }
 
     private String id(String type, String id) {
         return GlobalIdHelper.id(type, id)
+    }
+
+    private static Map<String, Object> parseVariables(String variables) {
+        if (variables && variables != "") {
+            return (Map<String, Object>) new JsonSlurper().parseText(variables)
+        }
+        return null
     }
 }

@@ -1,6 +1,7 @@
 package com.intuit.workshop.invoicing.web
 
 import com.intuit.workshop.invoicing.graphql.service.GraphQLExecutionService
+import groovy.json.JsonSlurper
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.http.MediaType
 import org.springframework.stereotype.Controller
@@ -33,7 +34,7 @@ class FrontController {
     @ResponseBody
     Object execute(@RequestBody Map body) {
         String query = (String) body.get("query")
-        Map<String, Object> variables = (Map<String, Object>) body.get("variables");
+        Map<String, Object> variables = getVariablesFromRequest(body)
         return graphQLExecutionService.execute(query, variables);
     }
 
@@ -46,6 +47,17 @@ class FrontController {
     @ResponseBody
     Object executeIntrospection() {
         return graphQLExecutionService.executeIntrospection()
+    }
+
+    private static Map<String, Object> getVariablesFromRequest(Map body) {
+        Object variables = body.get("variables")
+        if (variables instanceof HashMap) {
+            return (Map<String, Object>)variables
+        }
+        if (variables instanceof String && variables != "") {
+            return (Map<String, Object>) new JsonSlurper().parseText(variables)
+        }
+        return null
     }
 
 }
