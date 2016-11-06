@@ -83,7 +83,8 @@ mutation InvoiceMutation {
             },
             number: 1234,
             customer: {
-                id: "customer-2"
+                id: "customer-2",
+                businessName: "Juan"
             },
             creationDate: "Sat Jan 01 00:00:00 GMT 2000",
             paymentDate: "Sat Jan 01 00:00:00 GMT 2000",
@@ -115,7 +116,8 @@ mutation InvoiceMutation {
             },
             number: 1234,
             customer: {
-                id: "customer-2"
+                id: "customer-2",
+                businessName: "Juan"
             },
             creationDate: "Sat Jan 01 00:00:00 GMT 2000",
             paymentDate: "Sat Jan 01 00:00:00 GMT 2000",
@@ -182,4 +184,3 @@ mutation InvoiceMutation {
 """
 
 }
-
