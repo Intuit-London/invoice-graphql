@@ -36,7 +36,143 @@ It should return something similar to:
 {"data":{"users":[{"id":"L1VzZXI6dXNlci0x","invoices":[{"id":"L0ludm9pY2U6aW52b2ljZS0x"},{"id":"L0ludm9pY2U6aW52b2ljZS0y"}]}]}}
 ```
 
+## Full Query
+
+The server comes with some static data loaded on bootstrap, which allows to try queries right away.
+
+For instance, the following query (in any GraphiQL-like extension as [ChromeiQL](https://chrome.google.com/webstore/detail/chromeiql/fkkiamalmpiidkljmicmjfbieiclmeij)):
+
+```
+{
+    users {
+        id
+        firstName
+        lastName
+        invoices {
+            id
+            user {
+                id
+            }
+            number
+            customer {
+                id
+                businessName
+                invoices {
+                    id
+                }
+            }
+            creationDate
+            paymentDate
+            paid
+            items {
+                id
+                invoice {
+                    id
+                }
+                name
+                price
+            }
+            totalAmount
+        }
+    }
+}
+```
+
+will return something like:
+
+```
+{
+  "data": {
+    "users": [
+      {
+        "id": "L1VzZXI6dXNlci0x",
+        "firstName": "Alexander",
+        "lastName": "Fleming",
+        "invoices": [
+          {
+            "id": "L0ludm9pY2U6aW52b2ljZS0x",
+            "user": {
+              "id": "L1VzZXI6dXNlci0x"
+            },
+            "number": 1,
+            "customer": {
+              "id": "L0N1c3RvbWVyOmN1c3RvbWVyLTE=",
+              "businessName": "Erns Boris Chain",
+              "invoices": [
+                {
+                  "id": "L0ludm9pY2U6aW52b2ljZS0x"
+                }
+              ]
+            },
+            "creationDate": "Sat Oct 01 00:00:00 BST 1927",
+            "paymentDate": "Sat Oct 01 00:00:00 BST 1927",
+            "paid": true,
+            "items": [
+              {
+                "id": "L0ludm9pY2VJdGVtOmludm9pY2UtMS1pdGVtLTE=",
+                "invoice": {
+                  "id": "L0ludm9pY2U6aW52b2ljZS0x"
+                },
+                "name": "Petri Dishes",
+                "price": 100
+              },
+              {
+                "id": "L0ludm9pY2VJdGVtOmludm9pY2UtMS1pdGVtLTI=",
+                "invoice": {
+                  "id": "L0ludm9pY2U6aW52b2ljZS0x"
+                },
+                "name": "Gloves",
+                "price": 200
+              }
+            ],
+            "totalAmount": 300
+          },
+          {
+            "id": "L0ludm9pY2U6aW52b2ljZS0y",
+            "user": {
+              "id": "L1VzZXI6dXNlci0x"
+            },
+            "number": 2,
+            "customer": {
+              "id": "L0N1c3RvbWVyOmN1c3RvbWVyLTI=",
+              "businessName": "Howard Florey",
+              "invoices": [
+                {
+                  "id": "L0ludm9pY2U6aW52b2ljZS0y"
+                }
+              ]
+            },
+            "creationDate": "Sat Oct 01 00:00:00 BST 1927",
+            "paymentDate": null,
+            "paid": false,
+            "items": [
+              {
+                "id": "L0ludm9pY2VJdGVtOmludm9pY2UtMi1pdGVtLTE=",
+                "invoice": {
+                  "id": "L0ludm9pY2U6aW52b2ljZS0y"
+                },
+                "name": "Staphylococcus plate culture",
+                "price": 50
+              }
+            ],
+            "totalAmount": 50
+          }
+        ]
+      }
+    ]
+  }
+}
+```
+
 A query with most of the schema can be seen in the [SchemaSpecFixture](src/test/groovy/com/intuit/workshop/invoicing/util/SchemaSpecFixture.groovy) class.
+
+## References
+
+- [GraphQL Official Site](http://graphql.org/)
+- [GraphQL Spec](https://facebook.github.io/graphql/)
+- [GraphQL Reference Implementation for JavaScript](https://github.com/graphql/graphql-js)
+- [Awesome GraphQl](https://github.com/chentsulin/awesome-graphql)
+- [GraphQL Java Library](https://github.com/graphql-java/graphql-java)
 
 ## License
 
