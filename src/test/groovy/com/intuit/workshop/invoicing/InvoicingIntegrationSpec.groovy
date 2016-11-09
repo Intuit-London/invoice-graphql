@@ -26,8 +26,8 @@ class InvoicingIntegrationSpec extends Specification {
                         [
 
                                 id       : id("/User", "user-1"),
-                                firstName: "First",
-                                lastName : "User",
+                                firstName: "Alexander",
+                                lastName : "Fleming",
                                 invoices : [
                                         [
                                                 id          : id("/Invoice", "invoice-1"),
@@ -37,7 +37,7 @@ class InvoicingIntegrationSpec extends Specification {
                                                 number      : 1,
                                                 customer    : [
                                                         id          : id("/Customer", "customer-1"),
-                                                        businessName: "First Customer Ever",
+                                                        businessName: "Erns Boris Chain",
                                                         invoices    : [
                                                                 [
                                                                         id: id("/Invoice", "invoice-1")
@@ -54,7 +54,7 @@ class InvoicingIntegrationSpec extends Specification {
                                                                 invoice: [
                                                                         id: id("/Invoice", "invoice-1")
                                                                 ],
-                                                                name   : "Bags",
+                                                                name   : "Petri Dishes",
                                                                 price  : 100
                                                         ],
                                                         [
@@ -78,7 +78,7 @@ class InvoicingIntegrationSpec extends Specification {
                                                 number      : 2,
                                                 customer    : [
                                                         id          : id("/Customer", "customer-2"),
-                                                        businessName: "Second Customer",
+                                                        businessName: "Howard Florey",
                                                         invoices    : [
                                                                 [
                                                                         id: id("/Invoice", "invoice-2")
@@ -95,7 +95,7 @@ class InvoicingIntegrationSpec extends Specification {
                                                                 invoice: [
                                                                         id: id("/Invoice", "invoice-2")
                                                                 ],
-                                                                name   : "Glasses",
+                                                                name   : "Staphylococcus plate culture",
                                                                 price  : 50
                                                         ],
                                                 ],
@@ -115,8 +115,8 @@ class InvoicingIntegrationSpec extends Specification {
                         [
 
                                 id       : id("/User", "user-1"),
-                                firstName: "First",
-                                lastName : "User",
+                                firstName: "Alexander",
+                                lastName : "Fleming",
                         ]
 
                 ]
@@ -131,8 +131,8 @@ class InvoicingIntegrationSpec extends Specification {
                         [
 
                                 id       : id("/User", "user-1"),
-                                firstName: "First",
-                                lastName : "User",
+                                firstName: "Alexander",
+                                lastName : "Fleming",
                         ]
 
                 ]
