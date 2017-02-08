@@ -26,6 +26,9 @@ class InvoiceGraphQLSchemaFactory {
     DataFetcher userQueryDataFetcher
 
     @Autowired
+    DataFetcher invoiceConnectionDataFetcher
+
+    @Autowired
     DataFetcher nodeQueryDataFetcher
 
     @Autowired
@@ -44,6 +47,7 @@ class InvoiceGraphQLSchemaFactory {
 
         GraphQLObjectType OutputUserType = null
         GraphQLObjectType OutputInvoiceType = null
+        GraphQLObjectType OutputInvoiceConnectionType = null
         GraphQLObjectType OutputInvoiceItemType = null
         GraphQLObjectType OutputCustomerType = null
 
@@ -178,6 +182,8 @@ class InvoiceGraphQLSchemaFactory {
                                              .build()
 
 
+        OutputInvoiceConnectionType = relay.connectionType("Invoice", relay.edgeType("Invoice", OutputInvoiceType, NodeInterfaceType, []), [])
+
         OutputUserType = GraphQLObjectType.newObject()
                                           .name("User")
                                           .field(GraphQLFieldDefinition.newFieldDefinition()
@@ -198,6 +204,13 @@ class InvoiceGraphQLSchemaFactory {
                                           .field(GraphQLFieldDefinition.newFieldDefinition()
                                                                        .name("invoices")
                                                                        .type(new GraphQLList(OutputInvoiceType))
+                                                                       .build())
+
+                                          .field(GraphQLFieldDefinition.newFieldDefinition()
+                                                                       .name("invoiceConnection")
+                                                                       .type(OutputInvoiceConnectionType)
+                                                                       .dataFetcher(invoiceConnectionDataFetcher)
+                                                                       .argument(relay.connectionFieldArguments)
                                                                        .build())
 
                                           .withInterface(NodeInterfaceType)

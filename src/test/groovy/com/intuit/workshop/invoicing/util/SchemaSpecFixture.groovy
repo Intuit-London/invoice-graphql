@@ -221,4 +221,44 @@ mutation CreateInvoice(\$input_0:CreateInvoiceInput!) {
 }
 """
 
+    static final String RELAY_CONNECTION_GET_FIRST_INVOICE_AFTER_ID =
+            """
+{
+    users {
+        id
+        invoiceConnection(first:1, after: "${GlobalIdHelper.id("/Invoice","invoice-1")}"){
+          edges{
+            node{
+                id
+                totalAmount
+            }
+          }
+          pageInfo{
+            hasNextPage
+          }
+        }
+    }
+}
+"""
+
+    static final String RELAY_CONNECTION_GET_LAST_INVOICE_BEFORE_ID =
+            """
+{
+    users {
+        id
+        invoiceConnection(last:1, before: "${GlobalIdHelper.id("/Invoice","invoice-2")}"){
+          edges{
+            node{
+                id
+                totalAmount
+            }
+          }
+          pageInfo{
+            hasPreviousPage
+          }
+        }
+    }
+}
+"""
+
 }

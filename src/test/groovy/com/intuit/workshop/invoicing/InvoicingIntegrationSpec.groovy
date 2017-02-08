@@ -149,6 +149,60 @@ class InvoicingIntegrationSpec extends Specification {
         ]
     }
 
+    void "Relay-Compliant connection query to filter invoices using forward pagination ('first' and 'after')"() {
+        expect:
+        Map<String, Object> result = successExecution(SchemaSpecFixture.RELAY_CONNECTION_GET_FIRST_INVOICE_AFTER_ID)
+        result == [
+                users: [
+                        [
+
+                                id               : id("/User", "user-1"),
+                                invoiceConnection: [
+                                        edges   : [
+                                                [
+                                                        node: [
+                                                                id: GlobalIdHelper.id("/Invoice","invoice-2"),
+                                                                totalAmount: 50
+                                                        ]
+                                                ]
+                                        ],
+                                        pageInfo: [
+                                                hasNextPage: false
+                                        ]
+                                ]
+                        ]
+
+                ]
+        ]
+    }
+
+    void "Relay-Compliant connection query to filter invoices using backward pagination ('last' and 'before')"() {
+        expect:
+        Map<String, Object> result = successExecution(SchemaSpecFixture.RELAY_CONNECTION_GET_LAST_INVOICE_BEFORE_ID)
+        result == [
+                users: [
+                        [
+
+                                id               : id("/User", "user-1"),
+                                invoiceConnection: [
+                                        edges   : [
+                                                [
+                                                        node: [
+                                                                id: GlobalIdHelper.id("/Invoice","invoice-1"),
+                                                                totalAmount: 300
+                                                        ]
+                                                ]
+                                        ],
+                                        pageInfo: [
+                                                hasPreviousPage: false
+                                        ]
+                                ]
+                        ]
+
+                ]
+        ]
+    }
+
     void "Relay-Compliant create mutation of a full invoice as an input"() {
         expect:
         Map<String, Object> result = successExecution(SchemaSpecFixture.RELAY_CREATE_INVOICE_MUTATION)
@@ -211,8 +265,8 @@ class InvoicingIntegrationSpec extends Specification {
                         clientMutationId: "client-mutation-1",
                         invoiceItem     :
                                 [
-                                        id: id("/InvoiceItem", "invoice-1-item-1"),
-                                        name: "Food",
+                                        id   : id("/InvoiceItem", "invoice-1-item-1"),
+                                        name : "Food",
                                         price: 1000
                                 ]
 
