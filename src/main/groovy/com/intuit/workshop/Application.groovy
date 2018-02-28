@@ -11,7 +11,6 @@ class Application {
     static main(args) {
         new SpringApplicationBuilder()
                 .sources(Application.class)
-                .bannerMode(Banner.Mode.OFF)
                 .run()
     }
 }

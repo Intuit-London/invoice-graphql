@@ -166,6 +166,38 @@ will return something like:
 
 A query with most of the schema can be seen in the [SchemaSpecFixture](src/test/groovy/com/intuit/workshop/invoicing/util/SchemaSpecFixture.groovy) class.
 
+## Docker Image
+
+The project comes with ``Dockerfile`` file describing an image to run the application.
+
+To build a locally tagged image:
+
+```sh
+$ ./gradlew build docker
+```
+
+To run a container with the image in local (you need to have [Docker](https://www.docker.com/) installed and running in your laptop):
+
+```sh
+$ docker run -p 8081:8080 -t com.intuit.workshop/invoice-grapqhl
+```
+
+Now the application is running in ``http://localhost:8081/graphql``:
+
+```sh
+$ curl -X POST -H "Content-Type:application/json"  -d '{"query":"{ users { id \n invoices { id } } }" }' http://localhost:8081/graphql
+{"data":{"users":[{"id":"L1VzZXI6dXNlci0x","invoices":[{"id":"L0ludm9pY2U6aW52b2ljZS0x"},{"id":"L0ludm9pY2U6aW52b2ljZS0y"}]}]}}
+```
+
+To list the containers running:
+
+```sh
+$ docker ps
+CONTAINER ID        IMAGE                                 COMMAND                CREATED             STATUS              PORTS                    NAMES
+53e7c0f2233f        com.intuit.workshop/invoice-grapqhl   "java -jar /app.jar"   7 minutes ago       Up 7 minutes        0.0.0.0:8081->8080/tcp   ***
+```
+
+
 ## References
 
 - [GraphQL Official Site](http://graphql.org/)
